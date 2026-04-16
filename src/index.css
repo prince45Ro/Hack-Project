@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@keyframes flow {
+    0% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -28; } /* dasharray sum = 8+6 = 14, moving negative makes it flow forward */
+  }
+  .animate-flow {
+    animation: flow 1s linear infinite;
+  }
