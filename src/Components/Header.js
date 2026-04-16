@@ -4,7 +4,7 @@ import { Typewriter } from "react-simple-typewriter";
 export function Navbar() {
   return (
     <header className="fixed top-0 left-0 w-full z-50">
-      <div className="mx-auto mt-4 w-[95%] rounded-full 
+      <div className="mx-auto mt-2 w-[95%] rounded-full 
         bg-white/20 backdrop-blur-xl border border-white/30
         shadow-md px-8 py-3 flex items-center justify-between transition-all duration-300">
 
@@ -34,14 +34,15 @@ export function Navbar() {
 
 export default function Header() {
   return (
-    <header className="relative overflow-hidden text-gray-800">
+    <header className="relative overflow-hidden text-gray-800 min-h-screen">
       {/* Background Image */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 w-full h-full -z-10">
         <img
           src="https://media.istockphoto.com/id/2093568992/vector/job-interview-vector-simple.jpg?s=612x612&w=0&k=20&c=LnyP-YfeSW2L_jckMGu_Z_T46QKC5q2c_ejfBoWWdYs="
           alt="background"
-          className="w-full h-full object-cover opacity-20 "
+          className="w-full h-full object-cover opacity-25 scale-105"
         />
+        <div className="absolute bottom-0 left-0 w-full h-40 bg-linear-to-b from-transparent to-slate-100"></div>
       </div>
       {/* Animated water‑like ripples */}
       <div className="absolute inset-0 overflow-hidden">
@@ -56,7 +57,7 @@ export default function Header() {
       {/* Water‑glass Navbar - highly transparent with shimmer */}
       <div className="relative z-20 px-4 sm:px-6 lg:px-8 pt-5">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center bg-white/60 backdrop-blur-xl border border-white/40 rounded-2xl shadow-md px-6 py-3 transition-all duration-300 hover:bg-white/80 hover:shadow-lg">
+          <div className="flex justify-between items-center bg-slate-200/70 backdrop-blur-xl border border-slate-300 rounded-full shadow-md px-8 py-3 transition-all duration-300 hover:bg-slate-200 hover:shadow-lg">
             <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-cyan-400 to-blue-500">
               AIX
             </h1>
@@ -66,7 +67,7 @@ export default function Header() {
                 <Link
                   key={item}
                   to={`/${item.toLowerCase()}`}
-                  className="relative px-4 py-2 rounded-full font-medium text-slate-700 bg-white/40 backdrop-blur-sm border border-white/40 transition-all duration-300 hover:bg-white/70 hover:border-white/60 hover:text-slate-900 hover:shadow-sm hover:scale-105"
+                  className="relative px-4 py-2 rounded-full font-medium text-slate-700 bg-slate-100 backdrop-blur-sm border border-slate-300 transition-all duration-300 hover:bg-slate-200 hover:border-slate-400 hover:text-slate-900 hover:shadow-sm hover:scale-105"
                 >
                   {item}
                 </Link>
@@ -75,7 +76,7 @@ export default function Header() {
                 to="/login"
                 className="px-6 py-2.5 rounded-full font-semibold bg-linear-to-r from-cyan-400 to-blue-500 backdrop-blur-md border border-white/50 text-white shadow-sm transition-all duration-300 hover:shadow-md hover:scale-105 hover:from-cyan-500 hover:to-blue-600"
               >
-                Login
+                Login / SignUp
               </Link>
             </nav>
 
@@ -100,7 +101,7 @@ export default function Header() {
       </div>
 
       {/* Hero Section - content remains the same but with adjusted colors to match water theme */}
-      <div className="relative z-10 max-w-7xl mx-auto flex flex-col lg:flex-row items-center px-6 md:px-8 py-12 lg:py-20 gap-12">
+      <div className="relative z-10 max-w-7xl mx-auto flex flex-col lg:flex-row items-center px-6 md:px-8 pt-16 pb-8 lg:pt-20 lg:pb-10 gap-10">
         {/* Left Content */}
         <div className="lg:w-1/2 space-y-8">
           
@@ -138,9 +139,9 @@ export default function Header() {
           <div className="flex flex-wrap gap-5">
             <Link
               to="/start"
-              className="group px-8 py-4 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-white font-semibold text-lg shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:bg-slate-800 inline-flex items-center gap-2"
+              className="group px-8 py-4 mt-20 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-white font-semibold text-lg shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:bg-slate-800 inline-flex items-center gap-2"
             >
-            Get Started 
+            Try a Free Mock Interview 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 transition-transform group-hover:translate-x-1"
@@ -156,46 +157,14 @@ export default function Header() {
                 />
               </svg>
             </Link>
-            <Link
-              to="/learn"
-              className="px-8 py-4 rounded-xl bg-white/30 backdrop-blur-sm border border-white/60 text-slate-700 font-medium text-lg transition-all duration-300 hover:bg-white/50 hover:border-white/80 hover:shadow-md"
-            >
-              Learn More
-            </Link>
+           
           </div>
 
-          {/* Trust indicator with water‑glass effect */}
-          <div className="flex items-center gap-4 pt-4">
-            <div className="flex items-center gap-1 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/40">
-              {[...Array(5)].map((_, i) => (
-                <svg
-                  key={i}
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 ${
-                    i < 4 ? "text-amber-400" : "text-amber-200"
-                  }`}
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <p className="text-slate-600 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/40">
-              <span className="font-semibold text-slate-800">5,000+</span>{" "}
-              interviews practiced
-            </p>
-          </div>
+         
         </div>
 
         {/* Right Image with water‑glass frame */}
-        <div className="lg:w-1/2 flex justify-center items-center relative">
-          <div className="absolute inset-0 bg-linear-to-tr from-cyan-400/20 to-blue-400/20 rounded-3xl blur-2xl -z-10"></div>
-          <div className="hidden lg:block w-1/2"></div>
-          {/* Decorative water droplets */}
-          <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-cyan-300/30 blur-xl animate-pulse"></div>
-          <div className="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-blue-300/30 blur-xl animate-pulse delay-700"></div>
-        </div>
+        
       </div>
 
       <style>{`
