@@ -9,7 +9,7 @@ export default function Body() {
         "https://t4.ftcdn.net/jpg/08/80/14/63/240_F_880146375_SYk2GHREB68lHG22dcxIZ9zdLwNXdrh9.jpg",
       alt: "Mock interview session",
       primaryButton: "Explore",
-      primaryLink: "/mock",
+      primaryLink: "/interviews",
       color: "from-blue-500/20 to-indigo-500/20",
     },
     {
@@ -326,6 +326,7 @@ export default function Body() {
           {/* Crack Interviews Section */}
           {/* Crack Interviews Section */}
           <motion.div
+            id="features"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
@@ -534,6 +535,9 @@ export default function Body() {
         </div>
       </LazyMotion>
       <style>{`
+          html {
+            scroll-behavior: smooth;
+          }
           @keyframes gradient-shift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }

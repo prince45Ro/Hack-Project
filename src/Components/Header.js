@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 
 export function Navbar() {
