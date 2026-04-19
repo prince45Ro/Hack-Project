@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import { navItems, aiShortcuts } from "./dashboard/data";
+import { companyLogos } from "./companyLogos";
 
 const TYPES = [
   {
@@ -9,7 +10,7 @@ const TYPES = [
     subtitle: "Full-stack simulated interviews",
     description: "Practice end-to-end mock interviews across frontend, backend, system design, DSA, and more. Includes company-specific FAANG rounds.",
     path: "/mock",
-    emoji: "🎯",
+    icon: <img src="https://img.icons8.com/fluency/96/goal.png" alt="Mock" className="w-10 h-10 object-contain drop-shadow-sm" />,
     tags: ["Frontend","Backend","System Design","DSA","Product"],
     color: "from-blue-500 to-indigo-600",
     glow: "shadow-blue-500/20",
@@ -21,7 +22,7 @@ const TYPES = [
     subtitle: "Language & framework deep dives",
     description: "Language-specific and framework-focused technical rounds — JavaScript, Python, Java, SQL, Cloud, ML and company technical rounds.",
     path: "/technical",
-    emoji: "💻",
+    icon: <img src="https://img.icons8.com/fluency/96/monitor.png" alt="Technical" className="w-10 h-10 object-contain drop-shadow-sm" />,
     tags: ["JavaScript","Python","Java","Cloud","ML","React"],
     color: "from-emerald-500 to-teal-600",
     glow: "shadow-emerald-500/20",
@@ -33,7 +34,7 @@ const TYPES = [
     subtitle: "Behavioral & culture-fit rounds",
     description: "Master behavioral questions, salary negotiation, leadership stories, and company culture rounds for Amazon, Google, Meta, Microsoft and more.",
     path: "/hr-interview",
-    emoji: "🤝",
+    icon: <img src="https://img.icons8.com/fluency/96/handshake.png" alt="HR" className="w-10 h-10 object-contain drop-shadow-sm" />,
     tags: ["Behavioral","Leadership","Negotiation","Culture Fit","STAR Method"],
     color: "from-rose-500 to-pink-600",
     glow: "shadow-rose-500/20",
@@ -43,19 +44,21 @@ const TYPES = [
 ];
 
 const COMPANY_LOGOS = [
-  { name: "Google", logo: "https://logo.clearbit.com/google.com" },
-  { name: "Amazon", logo: "https://logo.clearbit.com/amazon.com" },
-  { name: "Meta", logo: "https://logo.clearbit.com/meta.com" },
-  { name: "Microsoft", logo: "https://logo.clearbit.com/microsoft.com" },
-  { name: "Netflix", logo: "https://logo.clearbit.com/netflix.com" },
-  { name: "Apple", logo: "https://logo.clearbit.com/apple.com" },
-  { name: "Uber", logo: "https://logo.clearbit.com/uber.com" },
+  { name: "Google", logo: companyLogos.google },
+  { name: "Amazon", logo: companyLogos.amazon },
+  { name: "Meta", logo: companyLogos.meta },
+  { name: "Microsoft", logo: companyLogos.microsoft },
+  { name: "Netflix", logo: companyLogos.netflix },
+  { name: "Apple", logo: companyLogos.apple },
+  { name: "Uber", logo: companyLogos.uber },
+  { name: "Flipkart", logo: companyLogos.flipkart },
+  { name: "Meesho", logo: companyLogos.meesho },
 ];
 
 export default function InterviewsHub() {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t); }, []);
+  useEffect(() => { window.scrollTo(0,0); const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t); }, []);
 
   return (
     <DashboardLayout projectName="AIX" projectSubtitle="Interview AI" navItems={navItems} activeNav="Interviews" setActiveNav={() => {}} aiShortcuts={aiShortcuts}>
@@ -68,15 +71,13 @@ export default function InterviewsHub() {
         </div>
 
         {/* 3 Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 mb-12">
           {TYPES.map((type, idx) => (
-            <button key={type.path} onClick={() => navigate(type.path)} className={`group text-left bg-white rounded-3xl border border-slate-200 overflow-hidden hover:shadow-2xl ${type.border} transition-all duration-300 hover:-translate-y-1`}
+            <button key={type.path} onClick={() => navigate(type.path)} className={`group text-left bg-gradient-to-b from-white to-slate-50/80 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] ${type.border} transition-all duration-500 hover:-translate-y-2`}
               style={{ opacity: visible?1:0, transform: visible?"translateY(0)":"translateY(28px)", transitionDelay:`${idx*100}ms`, transitionDuration:"500ms" }}>
-              {/* Gradient top bar */}
-              <div className={`h-2 w-full bg-gradient-to-r ${type.color}`} />
               <div className="p-7">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${type.color} flex items-center justify-center text-3xl mb-6 shadow-lg ${type.glow}`}>
-                  {type.emoji}
+                <div className={`w-16 h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center mb-6 shadow-sm ${type.glow}`}>
+                  {type.icon}
                 </div>
                 <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">{type.subtitle}</p>
                 <h2 className="text-2xl font-extrabold text-slate-900 mb-3">{type.title}</h2>

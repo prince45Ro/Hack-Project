@@ -1,4 +1,5 @@
 import { motion, LazyMotion, domAnimation } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function Body() {
   const cards = [
@@ -158,15 +159,16 @@ export default function Body() {
                     {card.description}
                   </p>
                   <div className="space-y-3">
-                    <a
-                      href={card.primaryLink}
+                    <Link
+                      to={card.primaryLink}
+                      onClick={() => window.scrollTo(0, 0)}
                       className="group/btn block w-full px-5 py-2.5 rounded-full bg-slate-800 text-white text-sm font-medium border border-slate-700 shadow-sm transition-all duration-300 hover:bg-slate-900 hover:scale-105"
                     >
                       {card.primaryButton}
                       <span className="inline-block ml-2 transition-transform duration-300 group-hover/btn:translate-x-1">
                         →
                       </span>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </motion.div>
@@ -324,14 +326,13 @@ export default function Body() {
           </div>
 
           {/* Crack Interviews Section */}
-          {/* Crack Interviews Section */}
           <motion.div
             id="features"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.8 }}
-            className="mt-24 mb-24"
+            className="mt-24 mb-24 scroll-mt-28"
           >
             <div className="max-w-6xl mx-auto text-center">
               <h2 className="text-3xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">
@@ -518,19 +519,20 @@ export default function Body() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="mt-16 text-center"
+            className="mt-16 text-center mb-16"
           >
-            <div className="inline-block bg-white/70 backdrop-blur-lg rounded-full px-8 py-3 border border-white/80 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <p className="text-slate-700 text-sm font-medium">
+            <Link to="/interviews" onClick={() => window.scrollTo(0,0)} className="inline-block bg-slate-900 text-white rounded-full px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-slate-800 cursor-pointer group">
+              <p className="text-sm font-medium flex items-center justify-center gap-2">
                 🚀{" "}
-                <span className="font-semibold">
-                  Ready to ace your interview?
-                </span>{" "}
-                <span className="font-light">
-                  Start practicing today — it's free!
+                <span className="font-bold">
+                  Try free mock interview
                 </span>
+                <span className="opacity-70 font-light hidden sm:inline">
+                  — Explore Interviews
+                </span>
+                <span className="inline-block ml-1 transition-transform duration-300 group-hover:translate-x-1">→</span>
               </p>
-            </div>
+            </Link>
           </motion.div>
         </div>
       </LazyMotion>

@@ -2,26 +2,62 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import { navItems, aiShortcuts } from "./dashboard/data";
+import { companyLogos } from "./companyLogos";
 
 const SKILL_INTERVIEWS = [
-  { id: 1, title: "Frontend Developer", description: "React, CSS, JS fundamentals and UI performance.", category: "Technical", isPremium: false, duration: "45 mins", difficulty: "Beginner–Intermediate", questions: 12, topics: ["React Hooks", "CSS Flexbox", "JavaScript ES6+", "Browser APIs", "Performance"], prerequisites: ["Basic HTML & CSS", "JavaScript basics"], tc: ["1 free session per day", "AI feedback after completion", "Score saved 7 days", "No time extension"], icon: "💻" },
-  { id: 2, title: "Backend Developer", description: "Node.js, Databases, API design and backend architecture.", category: "Technical", isPremium: false, duration: "60 mins", difficulty: "Intermediate", questions: 15, topics: ["REST API Design", "Node.js", "SQL & NoSQL", "Auth & JWT", "Caching"], prerequisites: ["Basic programming", "HTTP basics"], tc: ["1 free session per day", "AI feedback included", "Cannot be paused once started", "Score saved 7 days"], icon: "🛠️" },
-  { id: 3, title: "System Design", description: "High-level architecture, scalability, and distributed systems.", category: "Architecture", isPremium: true, duration: "90 mins", difficulty: "Advanced", questions: 8, topics: ["Load Balancing", "Microservices", "CAP Theorem", "Message Queues", "DB Sharding"], prerequisites: ["2+ years experience", "Backend fundamentals"], tc: ["Premium required", "Unlimited sessions", "Mentor review add-on", "Session saved 30 days", "Refund in 3 days"], icon: "🏗️" },
-  { id: 4, title: "DSA & Algorithms", description: "Leetcode-style questions — trees, graphs, dynamic programming.", category: "Technical", isPremium: true, duration: "60 mins", difficulty: "Intermediate–Advanced", questions: 10, topics: ["Arrays & Strings", "Trees & Graphs", "Dynamic Programming", "Recursion", "Sorting"], prerequisites: ["Basic programming", "Time/Space complexity"], tc: ["Premium required", "Unlimited sessions", "Hints deduct 5 marks", "Leaderboard results", "Refund in 3 days"], icon: "🧩" },
-  { id: 5, title: "Behavioral & HR", description: "Leadership principles, culture fit, and conflict resolution.", category: "Soft Skills", isPremium: false, duration: "30 mins", difficulty: "Beginner", questions: 10, topics: ["STAR Method", "Conflict Resolution", "Leadership", "Culture Fit", "Strengths/Weaknesses"], prerequisites: ["None"], tc: ["1 free session per day", "AI tone analysis", "Transcript available", "No re-attempt in 24h"], icon: "🤝" },
-  { id: 6, title: "Product Management", description: "Product sense, execution, and strategy interview simulations.", category: "Product", isPremium: true, duration: "60 mins", difficulty: "Intermediate–Advanced", questions: 8, topics: ["Product Sense", "Metrics & Analytics", "Prioritization", "GTM Strategy", "User Research"], prerequisites: ["Business basics", "Product lifecycle"], tc: ["Premium required", "Unlimited sessions", "Case materials included", "PM alumni feedback", "Refund in 3 days"], icon: "📊" },
+  { id: 1, title: "Frontend Developer", description: "React, CSS, JS fundamentals and UI performance.", category: "Technical", isPremium: false, duration: "45 mins", difficulty: "Beginner–Intermediate", questions: 12, topics: ["React Hooks", "CSS Flexbox", "JavaScript ES6+", "Browser APIs", "Performance"], prerequisites: ["Basic HTML & CSS", "JavaScript basics"], tc: ["1 free session per day", "AI feedback after completion", "Score saved 7 days", "No time extension"], icon: <img src="https://img.icons8.com/fluency/96/monitor.png" alt="Frontend" className="w-12 h-12 object-contain drop-shadow-sm" /> },
+  { id: 2, title: "Backend Developer", description: "Node.js, Databases, API design and backend architecture.", category: "Technical", isPremium: false, duration: "60 mins", difficulty: "Intermediate", questions: 15, topics: ["REST API Design", "Node.js", "SQL & NoSQL", "Auth & JWT", "Caching"], prerequisites: ["Basic programming", "HTTP basics"], tc: ["1 free session per day", "AI feedback included", "Cannot be paused once started", "Score saved 7 days"], icon: <img src="https://img.icons8.com/fluency/96/server.png" alt="Backend" className="w-12 h-12 object-contain drop-shadow-sm" /> },
+  { id: 3, title: "System Design", description: "High-level architecture, scalability, and distributed systems.", category: "Architecture", isPremium: true, duration: "90 mins", difficulty: "Advanced", questions: 8, topics: ["Load Balancing", "Microservices", "CAP Theorem", "Message Queues", "DB Sharding"], prerequisites: ["2+ years experience", "Backend fundamentals"], tc: ["Premium required", "Unlimited sessions", "Mentor review add-on", "Session saved 30 days", "Refund in 3 days"], icon: <img src="https://img.icons8.com/fluency/96/network.png" alt="System Design" className="w-12 h-12 object-contain drop-shadow-sm" /> },
+  { id: 4, title: "DSA & Algorithms", description: "Leetcode-style questions — trees, graphs, dynamic programming.", category: "Technical", isPremium: true, duration: "60 mins", difficulty: "Intermediate–Advanced", questions: 10, topics: ["Arrays & Strings", "Trees & Graphs", "Dynamic Programming", "Recursion", "Sorting"], prerequisites: ["Basic programming", "Time/Space complexity"], tc: ["Premium required", "Unlimited sessions", "Hints deduct 5 marks", "Leaderboard results", "Refund in 3 days"], icon: <img src="https://img.icons8.com/fluency/96/puzzle.png" alt="DSA" className="w-12 h-12 object-contain drop-shadow-sm" /> },
+  { id: 5, title: "Behavioral & HR", description: "Leadership principles, culture fit, and conflict resolution.", category: "Soft Skills", isPremium: false, duration: "30 mins", difficulty: "Beginner", questions: 10, topics: ["STAR Method", "Conflict Resolution", "Leadership", "Culture Fit", "Strengths/Weaknesses"], prerequisites: ["None"], tc: ["1 free session per day", "AI tone analysis", "Transcript available", "No re-attempt in 24h"], icon: <img src="https://img.icons8.com/fluency/96/handshake.png" alt="Behavioral" className="w-12 h-12 object-contain drop-shadow-sm" /> },
+  { id: 6, title: "Product Management", description: "Product sense, execution, and strategy interview simulations.", category: "Product", isPremium: true, duration: "60 mins", difficulty: "Intermediate–Advanced", questions: 8, topics: ["Product Sense", "Metrics & Analytics", "Prioritization", "GTM Strategy", "User Research"], prerequisites: ["Business basics", "Product lifecycle"], tc: ["Premium required", "Unlimited sessions", "Case materials included", "PM alumni feedback", "Refund in 3 days"], icon: <img src="https://img.icons8.com/fluency/96/product.png" alt="Product Management" className="w-12 h-12 object-contain drop-shadow-sm" /> },
 ];
 
 const COMPANY_INTERVIEWS = [
-  { id: 7, title: "Google", description: "Coding, system design & Googleyness questions modelled on Google's real hiring process.", duration: "90 mins", difficulty: "Advanced", questions: 10, topics: ["Data Structures", "System Design at Scale", "Googleyness & Leadership", "Coding Round", "Behavioural Fit"], prerequisites: ["Strong DSA skills", "System design basics"], tc: ["Premium required", "Unlimited sessions", "Real Google-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🌐", color: "from-blue-500 to-green-400" },
-  { id: 8, title: "Amazon", description: "Leadership Principles deep dive + coding rounds exactly like Amazon's Bar Raiser process.", duration: "75 mins", difficulty: "Advanced", questions: 10, topics: ["14 Leadership Principles", "Coding (Medium/Hard)", "System Design", "Bar Raiser", "Ownership"], prerequisites: ["Amazon LP knowledge", "LeetCode medium"], tc: ["Premium required", "Unlimited sessions", "Amazon LP question bank", "Session saved 30 days", "Refund in 3 days"], emoji: "📦", color: "from-orange-500 to-amber-400" },
-  { id: 9, title: "Meta (Facebook)", description: "Product sense, coding & behavioural rounds tailored to Meta's unique interview style.", duration: "80 mins", difficulty: "Advanced", questions: 10, topics: ["Product Sense", "Coding Rounds", "Behavioural STAR", "System Design", "Analytical Thinking"], prerequisites: ["LeetCode medium", "Product intuition"], tc: ["Premium required", "Unlimited sessions", "Meta-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "👤", color: "from-blue-600 to-indigo-500" },
-  { id: 10, title: "Apple", description: "Design thinking, technical depth and Apple-culture fit across multiple rounds.", duration: "75 mins", difficulty: "Advanced", questions: 10, topics: ["Design Thinking", "Technical Depth", "Apple Culture Fit", "Coding", "Cross-functional"], prerequisites: ["Strong engineering background", "Apple product knowledge"], tc: ["Premium required", "Unlimited sessions", "Apple-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🍎", color: "from-slate-500 to-slate-700" },
-  { id: 11, title: "Netflix", description: "Dream team culture, high performance bar, senior engineering & PM interviews.", duration: "70 mins", difficulty: "Advanced", questions: 8, topics: ["Dream Team Culture", "Senior Engineering", "Keeper Test", "System Design", "Impact at Scale"], prerequisites: ["5+ years preferred", "Senior-level mindset"], tc: ["Premium required", "Unlimited sessions", "Netflix culture questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🎬", color: "from-red-600 to-rose-500" },
-  { id: 12, title: "Microsoft", description: "Growth mindset, coding depth and Azure/cloud questions for Microsoft's hiring loop.", duration: "75 mins", difficulty: "Advanced", questions: 10, topics: ["Growth Mindset", "Coding (Medium/Hard)", "Azure & Cloud", "System Design", "Culture Add"], prerequisites: ["LeetCode medium", "Basic cloud exposure"], tc: ["Premium required", "Unlimited sessions", "Microsoft-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🪟", color: "from-cyan-500 to-blue-500" },
-  { id: 13, title: "Uber", description: "Marketplace thinking, data-driven decisions and Uber's engineering culture.", duration: "65 mins", difficulty: "Intermediate–Advanced", questions: 9, topics: ["Marketplace Thinking", "Data-Driven Decisions", "Coding", "System Design", "Uber Values"], prerequisites: ["Backend or PM experience", "Data analysis basics"], tc: ["Premium required", "Unlimited sessions", "Uber-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🚗", color: "from-slate-800 to-slate-900" },
-  { id: 14, title: "Flipkart / Meesho", description: "Indian e-commerce — coding + PM + business case rounds with India-scale context.", duration: "60 mins", difficulty: "Intermediate", questions: 10, topics: ["India-scale Product", "Coding", "Business Case", "Data Analysis", "Culture Fit"], prerequisites: ["Basic DSA", "E-commerce basics"], tc: ["Premium required", "Unlimited sessions", "India-company questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🛒", color: "from-yellow-500 to-orange-400" },
+  { id: 7, title: "Google", logo: companyLogos.google, description: "Coding, system design & Googleyness questions modelled on Google's real hiring process.", duration: "90 mins", difficulty: "Advanced", questions: 10, topics: ["Data Structures", "System Design at Scale", "Googleyness & Leadership", "Coding Round", "Behavioural Fit"], prerequisites: ["Strong DSA skills", "System design basics"], tc: ["Premium required", "Unlimited sessions", "Real Google-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🌐", color: "from-blue-500 to-green-400" },
+  { id: 8, title: "Amazon", logo: companyLogos.amazon, description: "Leadership Principles deep dive + coding rounds exactly like Amazon's Bar Raiser process.", duration: "75 mins", difficulty: "Advanced", questions: 10, topics: ["14 Leadership Principles", "Coding (Medium/Hard)", "System Design", "Bar Raiser", "Ownership"], prerequisites: ["Amazon LP knowledge", "LeetCode medium"], tc: ["Premium required", "Unlimited sessions", "Amazon LP question bank", "Session saved 30 days", "Refund in 3 days"], emoji: "📦", color: "from-orange-500 to-amber-400" },
+  { id: 9, title: "Meta (Facebook)", logo: companyLogos.meta, description: "Product sense, coding & behavioural rounds tailored to Meta's unique interview style.", duration: "80 mins", difficulty: "Advanced", questions: 10, topics: ["Product Sense", "Coding Rounds", "Behavioural STAR", "System Design", "Analytical Thinking"], prerequisites: ["LeetCode medium", "Product intuition"], tc: ["Premium required", "Unlimited sessions", "Meta-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "👤", color: "from-blue-600 to-indigo-500" },
+  { id: 10, title: "Apple", logo: companyLogos.apple, description: "Design thinking, technical depth and Apple-culture fit across multiple rounds.", duration: "75 mins", difficulty: "Advanced", questions: 10, topics: ["Design Thinking", "Technical Depth", "Apple Culture Fit", "Coding", "Cross-functional"], prerequisites: ["Strong engineering background", "Apple product knowledge"], tc: ["Premium required", "Unlimited sessions", "Apple-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🍎", color: "from-slate-500 to-slate-700" },
+  { id: 11, title: "Netflix", logo: companyLogos.netflix, description: "Dream team culture, high performance bar, senior engineering & PM interviews.", duration: "70 mins", difficulty: "Advanced", questions: 8, topics: ["Dream Team Culture", "Senior Engineering", "Keeper Test", "System Design", "Impact at Scale"], prerequisites: ["5+ years preferred", "Senior-level mindset"], tc: ["Premium required", "Unlimited sessions", "Netflix culture questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🎬", color: "from-red-600 to-rose-500" },
+  { id: 12, title: "Microsoft", logo: companyLogos.microsoft, description: "Growth mindset, coding depth and Azure/cloud questions for Microsoft's hiring loop.", duration: "75 mins", difficulty: "Advanced", questions: 10, topics: ["Growth Mindset", "Coding (Medium/Hard)", "Azure & Cloud", "System Design", "Culture Add"], prerequisites: ["LeetCode medium", "Basic cloud exposure"], tc: ["Premium required", "Unlimited sessions", "Microsoft-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🪟", color: "from-cyan-500 to-blue-500" },
+  { id: 13, title: "Uber", logo: companyLogos.uber, description: "Marketplace thinking, data-driven decisions and Uber's engineering culture.", duration: "65 mins", difficulty: "Intermediate–Advanced", questions: 9, topics: ["Marketplace Thinking", "Data-Driven Decisions", "Coding", "System Design", "Uber Values"], prerequisites: ["Backend or PM experience", "Data analysis basics"], tc: ["Premium required", "Unlimited sessions", "Uber-format questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🚗", color: "from-slate-800 to-slate-900" },
+  { id: 14, title: "Flipkart / Meesho", logo: companyLogos.flipkart, secondaryLogo: companyLogos.meesho, description: "Indian e-commerce — coding + PM + business case rounds with India-scale context.", duration: "60 mins", difficulty: "Intermediate", questions: 10, topics: ["India-scale Product", "Coding", "Business Case", "Data Analysis", "Culture Fit"], prerequisites: ["Basic DSA", "E-commerce basics"], tc: ["Premium required", "Unlimited sessions", "India-company questions", "Session saved 30 days", "Refund in 3 days"], emoji: "🛒", color: "from-yellow-500 to-orange-400" },
 ];
+
+function CompanyLogo({ item }) {
+  const [primaryFailed, setPrimaryFailed] = useState(false);
+  const [secondaryFailed, setSecondaryFailed] = useState(false);
+
+  const showPrimary = Boolean(item.logo && !primaryFailed);
+  const showSecondary = Boolean(item.secondaryLogo && !secondaryFailed);
+
+  if (!showPrimary && !showSecondary) {
+    return <span className="text-3xl">{item.emoji || "🏢"}</span>;
+  }
+
+  const compact = showPrimary && showSecondary;
+
+  return (
+    <div className={`flex items-center ${compact ? "gap-1.5" : ""}`}>
+      {showPrimary && (
+        <img
+          src={item.logo}
+          alt={`${item.title} logo`}
+          className={`${compact ? "w-7 h-7" : "w-10 h-10"} object-contain`}
+          onError={() => setPrimaryFailed(true)}
+        />
+      )}
+      {showSecondary && (
+        <img
+          src={item.secondaryLogo}
+          alt={`${item.title} secondary logo`}
+          className={`${compact ? "w-7 h-7" : "w-10 h-10"} object-contain`}
+          onError={() => setSecondaryFailed(true)}
+        />
+      )}
+    </div>
+  );
+}
 
 export default function Mock() {
   const [filter, setFilter] = useState("All");
@@ -90,9 +126,9 @@ export default function Mock() {
         </div>
 
         {skillCards.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-4">
             {skillCards.map((item, idx) => (
-              <div key={item.id} className={cardClass} style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(32px)", transitionDelay: `${idx * 60}ms`, transitionDuration: "500ms", transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}>
+              <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-slate-50/50 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:border-blue-300 transition-all duration-500 hover:-translate-y-2" style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(32px)", transitionDelay: `${idx * 60}ms`, transitionDuration: "500ms", transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}>
                 <CardPopout item={item} isCompany={false} />
                 {item.isPremium ? (
                   <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
@@ -132,16 +168,15 @@ export default function Mock() {
               </div>
               <div className="flex-1 h-px bg-slate-200" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
               {COMPANY_INTERVIEWS.map((item, idx) => (
-                <div key={item.id} className="group relative flex flex-col bg-white rounded-3xl border border-slate-200 overflow-hidden hover:shadow-2xl hover:border-amber-200 transition-all duration-300 hover:-translate-y-1"
+                <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-amber-50/30 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(251,191,36,0.15)] hover:border-amber-300 transition-all duration-500 hover:-translate-y-2"
                   style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(32px)", transitionDelay: `${idx * 60}ms`, transitionDuration: "500ms" }}>
                   <CardPopout item={item} isCompany={true} />
                   <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
-                  <div className={`h-2 w-full bg-gradient-to-r ${item.color}`} />
                   <div className="p-7 flex-1">
                     <div className="w-16 h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center mb-5 shadow-sm group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-                      {item.logo ? <img src={item.logo} alt={item.title} className="w-10 h-10 object-contain" onError={(e)=>{e.target.replaceWith(Object.assign(document.createElement('span'),{textContent:item.emoji||'🏢',className:'text-3xl'}))}} /> : <span className="text-3xl">{item.emoji}</span>}
+                      <CompanyLogo item={item} />
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title} Interview</h3>
                     <p className="text-sm text-slate-500 leading-relaxed mb-3">{item.description}</p>
