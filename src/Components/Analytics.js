@@ -95,7 +95,7 @@ function RadialGauge({ value, size = 80, stroke = 8, color = "#6366f1" }) {
   const circ = 2 * Math.PI * r;
   const offset = circ - (value / 100) * circ;
   return (
-    <svg width={size} height={size} className="rotate-[-90deg]">
+    <svg width={size} height={size} className="-rotate-90">
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e2e8f0" strokeWidth={stroke} />
       <circle
         cx={size / 2} cy={size / 2} r={r} fill="none"
@@ -802,14 +802,14 @@ export default function Analytics() {
                 >
                   <div className="flex items-center gap-3 rounded-2xl p-3 hover:bg-slate-50 transition cursor-pointer">
                     <span className="text-xs font-bold text-slate-300 w-4 text-right">{i + 1}</span>
-                    <div className={`flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br ${style.avatarClass} text-white text-xs font-bold flex-shrink-0`}>
+                    <div className={`flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br ${style.avatarClass} text-white text-xs font-bold shrink-0`}>
                       {initials}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-slate-800 truncate">{c.name}</p>
                       <p className="text-xs text-slate-400 truncate">{c.role} · {c.sessions} sessions</p>
                     </div>
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-right shrink-0">
                       <p className="text-sm font-bold" style={{ color: band.text }}>{c.avg}</p>
                       <p className="text-[10px] font-semibold rounded-full px-1.5 py-0.5 mt-0.5" style={{ background: band.bg, color: band.text }}>{band.label}</p>
                     </div>
@@ -862,7 +862,7 @@ export default function Analytics() {
       {/* ── AI Insights Banner ── */}
       <div className="rounded-3xl p-6 mb-2" style={{ background: "linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#06b6d4 100%)" }}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white">
             <StatsIcon className="h-6 w-6" />
           </div>
           <div className="flex-1">
@@ -874,7 +874,7 @@ export default function Analytics() {
               }
             </p>
           </div>
-          <button className="flex-shrink-0 rounded-2xl bg-white/20 hover:bg-white/30 transition text-white text-sm font-semibold px-5 py-2.5">
+          <button className="shrink-0 rounded-2xl bg-white/20 hover:bg-white/30 transition text-white text-sm font-semibold px-5 py-2.5">
             View Report →
           </button>
         </div>

@@ -14,6 +14,23 @@ import Pricing from "./Components/Pricing";
 import Login from "./Components/login/login.js";
 import Register from "./Components/login/Register.js";
 import Verification from "./Components/login/Verification.js";
+import { useLocation } from "react-router-dom";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    // Disable smooth scrolling temporarily for instant snap to top
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    // Restore smooth scrolling if needed by other components
+    setTimeout(() => {
+      document.documentElement.style.scrollBehavior = 'smooth';
+    }, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -48,6 +65,7 @@ export function App() {
   return (
     <ErrorBoundary>
       <HashRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />

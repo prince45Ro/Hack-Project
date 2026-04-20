@@ -99,9 +99,9 @@ export default function Mock() {
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Topics</p>
           <div className="flex flex-wrap gap-1.5 mb-3">{topicList.map((t) => <span key={t} className="bg-white/8 text-slate-300 border border-white/10 text-[10px] font-semibold px-2.5 py-1 rounded-full">{t}</span>)}</div>
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Prerequisites</p>
-          <ul className="space-y-0.5 mb-3">{preList.map((p) => <li key={p} className="text-[11px] text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-500 flex-shrink-0" />{p}</li>)}</ul>
+          <ul className="space-y-0.5 mb-3">{preList.map((p) => <li key={p} className="text-[11px] text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0" />{p}</li>)}</ul>
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">T&amp;C</p>
-          <ul className="space-y-1 mb-4">{tcList.map((tc) => (<li key={tc} className="flex items-start gap-2 text-[11px] text-slate-300"><svg className="w-3 h-3 mt-0.5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>{tc}</li>))}</ul>
+          <ul className="space-y-1 mb-4">{tcList.map((tc) => (<li key={tc} className="flex items-start gap-2 text-[11px] text-slate-300"><svg className="w-3 h-3 mt-0.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>{tc}</li>))}</ul>
           <button onClick={() => setSelected(item)} className="w-full bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold py-3 rounded-2xl text-sm transition-all">
             {isCompany || item.isPremium ? "🔓 Unlock Now" : "▶ Start Mock"}
           </button>
@@ -128,10 +128,10 @@ export default function Mock() {
         {skillCards.length > 0 && (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-4">
             {skillCards.map((item, idx) => (
-              <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-slate-50/50 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:border-blue-300 transition-all duration-500 hover:-translate-y-2" style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(32px)", transitionDelay: `${idx * 60}ms`, transitionDuration: "500ms", transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}>
+              <div key={item.id} className="group relative flex flex-col bg-linear-to-b from-white to-slate-50/50 rounded-4xl border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:border-blue-300 transition-all duration-500 hover:-translate-y-2" style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(32px)", transitionDelay: `${idx * 60}ms`, transitionDuration: "500ms", transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)" }}>
                 <CardPopout item={item} isCompany={false} />
                 {item.isPremium ? (
-                  <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
+                  <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-linear-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
                 ) : (
                   <div className="absolute top-4 right-4 z-10 bg-emerald-100 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-emerald-700">Free</div>
                 )}
@@ -170,10 +170,10 @@ export default function Mock() {
             </div>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
               {COMPANY_INTERVIEWS.map((item, idx) => (
-                <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-amber-50/30 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(251,191,36,0.15)] hover:border-amber-300 transition-all duration-500 hover:-translate-y-2"
+                <div key={item.id} className="group relative flex flex-col bg-linear-to-b from-white to-amber-50/30 rounded-4xl border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(251,191,36,0.15)] hover:border-amber-300 transition-all duration-500 hover:-translate-y-2"
                   style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(32px)", transitionDelay: `${idx * 60}ms`, transitionDuration: "500ms" }}>
                   <CardPopout item={item} isCompany={true} />
-                  <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
+                  <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-linear-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
                   <div className="p-7 flex-1">
                     <div className="w-16 h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center mb-5 shadow-sm group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                       <CompanyLogo item={item} />

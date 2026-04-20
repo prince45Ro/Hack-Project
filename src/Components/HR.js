@@ -47,7 +47,7 @@ function CardPopout({ item, isCompany, onSelect }) {
         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Topics</p>
         <div className="flex flex-wrap gap-1.5 mb-3">{item.topics.map((t)=><span key={t} className="bg-white/8 text-slate-300 border border-white/10 text-[10px] font-semibold px-2.5 py-1 rounded-full">{t}</span>)}</div>
         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">T&amp;C</p>
-        <ul className="space-y-1 mb-4">{item.tc.map((tc)=>(<li key={tc} className="flex items-start gap-2 text-[11px] text-slate-300"><svg className="w-3 h-3 mt-0.5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>{tc}</li>))}</ul>
+        <ul className="space-y-1 mb-4">{item.tc.map((tc)=>(<li key={tc} className="flex items-start gap-2 text-[11px] text-slate-300"><svg className="w-3 h-3 mt-0.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>{tc}</li>))}</ul>
         <button onClick={()=>onSelect(item)} className="w-full bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold py-3 rounded-2xl text-sm transition-all">
           {isCompany||item.isPremium?"🔓 Unlock Now":"▶ Start Interview"}
         </button>
@@ -101,10 +101,10 @@ export default function HR() {
         {skillCards.length>0 && (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-4">
             {skillCards.map((item,idx)=>(
-              <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-slate-50/50 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:border-blue-300 transition-all duration-500 hover:-translate-y-2"
+              <div key={item.id} className="group relative flex flex-col bg-linear-to-b from-white to-slate-50/50 rounded-4xl border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:border-blue-300 transition-all duration-500 hover:-translate-y-2"
                 style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(32px)",transitionDelay:`${idx*60}ms`,transitionDuration:"500ms",transitionTimingFunction:"cubic-bezier(0.16,1,0.3,1)"}}>
                 <CardPopout item={item} isCompany={false} onSelect={setSelected}/>
-                {item.isPremium?(<div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>):(<div className="absolute top-4 right-4 z-10 bg-emerald-100 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-emerald-700">Free</div>)}
+                {item.isPremium?(<div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-linear-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>):(<div className="absolute top-4 right-4 z-10 bg-emerald-100 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-emerald-700">Free</div>)}
                 <div className="p-7 flex-1">
                   <div className="text-4xl mb-5">{item.icon}</div>
                   <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">{item.category}</div>
@@ -136,10 +136,10 @@ export default function HR() {
             <p className="text-sm text-slate-500 text-center mb-8">Company-specific HR interview simulations based on real hiring culture & values.</p>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
               {COMPANY_INTERVIEWS.map((item,idx)=>(
-                <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-amber-50/30 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(251,191,36,0.15)] hover:border-amber-300 transition-all duration-500 hover:-translate-y-2"
+                <div key={item.id} className="group relative flex flex-col bg-linear-to-b from-white to-amber-50/30 rounded-4xl border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(251,191,36,0.15)] hover:border-amber-300 transition-all duration-500 hover:-translate-y-2"
                   style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(32px)",transitionDelay:`${idx*60}ms`,transitionDuration:"500ms"}}>
                   <CardPopout item={item} isCompany={true} onSelect={setSelected}/>
-                  <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
+                  <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-linear-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
                   <div className="p-7 flex-1">
                     <div className="w-16 h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center mb-5 shadow-sm group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                       {item.logo ? <img src={item.logo} alt={item.title} className="w-10 h-10 object-contain" onError={(e)=>{e.target.replaceWith(Object.assign(document.createElement('span'),{textContent:item.emoji||'🏢',className:'text-3xl'}))}} /> : <span className="text-3xl">{item.emoji}</span>}

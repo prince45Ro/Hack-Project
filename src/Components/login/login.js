@@ -1,103 +1,147 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import GoogleAuthButton from "./GoogleAuthButton";
 
-export default function Login() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+const initialForm = {
+  email: "",
+  password: "",
+  rememberMe: false,
+};
+
+function validateForm(values) {
+  const nextErrors = {};
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!values.email.trim()) {
+    nextErrors.email = "Email is required.";
+  } else if (!emailPattern.test(values.email.trim())) {
+    nextErrors.email = "Enter a valid email address.";
+  }
+
+  if (!values.password) {
+    nextErrors.password = "Password is required.";
+  } else if (values.password.length < 6) {
+    nextErrors.password = "Password must be at least 6 characters.";
+  }
+
+  return nextErrors;
+}
+
+const Login = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState(initialForm);
+  const [errors, setErrors] = useState({});
 
   function handleChange(event) {
-    const { name, value } = event.target;
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
+    const { name, value, type, checked } = event.target;
+    const finalValue = type === "checkbox" ? checked : value;
+
+    setFormData((current) => ({ ...current, [name]: finalValue }));
+    setErrors((current) => ({ ...current, [name]: undefined }));
   }
 
   function handleSubmit(event) {
     event.preventDefault();
+    const nextErrors = validateForm(formData);
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
     console.log("Login submitted", formData);
+    navigate("/interviews");
+  }
+
+  function handleGoogleLogin() {
+    console.log("Mock Google Login submitted");
+    navigate("/interviews");
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-100 via-white to-sky-50 px-6 py-10">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-6">
-        <Link to="/home" className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors">
-          Back to Home
-        </Link>
-        <a href="#/interviews" onClick={(e) => { e.preventDefault(); window.location.href="#/interviews"; window.location.reload(); }} className="text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors">
-          Explore Interviews
-        </a>
-      </div>
-
-      <div className="mx-auto mt-10 grid max-w-5xl gap-8 rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] md:grid-cols-[1.1fr_0.9fr] md:p-10">
-        <div className="rounded-[28px] bg-linear-to-br from-slate-900 via-sky-900 to-cyan-700 p-8 text-white">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-sky-200">AIX Access</p>
-          <h1 className="mt-4 text-4xl font-black tracking-tight">Sign in to continue your interview prep</h1>
-          <p className="mt-4 max-w-md text-sm leading-7 text-sky-100">
-            Resume your mock interviews, review AI feedback, and jump back into company-specific practice from one place.
+    <div className="min-h-screen bg-slate-100 px-4 py-8 font-sans">
+      <div className="mx-auto w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 shadow-lg md:p-10 lg:p-12">
+        <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md">
+          <h2 className="text-3xl font-bold text-slate-900">Welcome back</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            Sign in to continue your interview journey.
           </p>
 
-          <div className="mt-8 grid gap-3">
-            {[
-              "Track your practice sessions",
-              "Open technical and HR rounds instantly",
-              "Keep your interview flow in one workspace",
-            ].map((item) => (
-              <div key={item} className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-medium text-sky-50">
-                {item}
-              </div>
-            ))}
+          <div className="mt-8 space-y-5">
+            <div>
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700">
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              />
+              {errors.email ? <p className="mt-1 text-xs text-red-600">{errors.email}</p> : null}
+            </div>
+
+            <div>
+              <label htmlFor="password" className="mb-2 block text-sm font-medium text-slate-700">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              />
+              {errors.password ? <p className="mt-1 text-xs text-red-600">{errors.password}</p> : null}
+            </div>
           </div>
-        </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col justify-center rounded-[28px] bg-slate-50 p-8">
-          <p className="text-sm font-bold uppercase tracking-[0.24em] text-slate-400">Login</p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-900">Welcome back</h2>
-          <p className="mt-2 text-sm text-slate-500">Use any email and password for the current prototype flow.</p>
-
-          <label className="mt-8 text-sm font-semibold text-slate-700" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="you@example.com"
-            className="mt-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-400"
-          />
-
-          <label className="mt-5 text-sm font-semibold text-slate-700" htmlFor="password">
-            Password
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
-            className="mt-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-400"
-          />
+          <div className="mt-4 flex items-center justify-between text-sm">
+            <label className="inline-flex items-center gap-2 text-slate-600">
+              <input
+                type="checkbox"
+                name="rememberMe"
+                checked={formData.rememberMe}
+                onChange={handleChange}
+                className="h-4 w-4 rounded border-slate-300 text-slate-700 focus:ring-slate-500"
+              />
+              Remember me
+            </label>
+            <Link to="/verification" className="font-medium text-slate-700 hover:text-slate-900">
+              Forgot password?
+            </Link>
+          </div>
 
           <button
             type="submit"
-            className="mt-8 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+            className="mt-7 w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800"
           >
-            Sign In
+            Login
           </button>
 
-          <p className="mt-4 text-sm text-slate-500">
+          <div className="my-6 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-slate-300 after:mt-0.5 after:flex-1 after:border-t after:border-slate-300">
+            <p className="mx-4 mb-0 text-center text-sm font-medium text-slate-500">
+              OR
+            </p>
+          </div>
+
+          <GoogleAuthButton label="Continue with Google" onClick={handleGoogleLogin} />
+
+          <p className="mt-5 text-center text-sm text-slate-600">
             New here?{" "}
-            <a href="#/register" onClick={(e) => { e.preventDefault(); window.location.href="#/register"; window.location.reload(); }} className="font-semibold text-sky-600 hover:text-sky-700">
+            <Link to="/register" className="font-semibold text-slate-700 hover:text-slate-900">
               Create an account
-            </a>
+            </Link>
           </p>
         </form>
       </div>
     </div>
   );
-}
+};
+
+export default Login;

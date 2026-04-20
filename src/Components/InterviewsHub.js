@@ -58,7 +58,13 @@ const COMPANY_LOGOS = [
 export default function InterviewsHub() {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
-  useEffect(() => { window.scrollTo(0,0); const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t); }, []);
+  useEffect(() => { 
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0,0);
+    setTimeout(() => { document.documentElement.style.scrollBehavior = 'smooth'; }, 0);
+    const t = setTimeout(() => setVisible(true), 60); 
+    return () => clearTimeout(t); 
+  }, []);
 
   return (
     <DashboardLayout projectName="AIX" projectSubtitle="Interview AI" navItems={navItems} activeNav="Interviews" setActiveNav={() => {}} aiShortcuts={aiShortcuts}>

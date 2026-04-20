@@ -1,149 +1,196 @@
-import { useState } from "react";
-// No separate CSS file needed with Tailwind
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import GoogleAuthButton from "./GoogleAuthButton";
 
-export default function Register() {
-    const [formData, setFormData] = useState({
-        Name: "",
-        email: "",
-        number: "",
-        password: "",
-        confirmPassword: "",
-        agreeToTerms: false // Checkbox state added
-    });
+const initialForm = {
+  fullName: "",
+  email: "",
+  phone: "",
+  password: "",
+  confirmPassword: "",
+  agreeToTerms: false,
+};
 
-    function handleChange(event) {
-        const { name, value, type, checked } = event.target;
-        const finalValue = type === 'checkbox' ? checked : value;
+function validateForm(values) {
+  const nextErrors = {};
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phonePattern = /^[0-9]{10,15}$/;
 
-        setFormData((currData) => {
-            return { ...currData, [name]: finalValue };
-        });
-    }
+  if (!values.fullName.trim()) nextErrors.fullName = "Full name is required.";
+  if (!values.email.trim()) {
+    nextErrors.email = "Email is required.";
+  } else if (!emailPattern.test(values.email.trim())) {
+    nextErrors.email = "Enter a valid email address.";
+  }
 
-    function handleSubmit(event) {
-        event.preventDefault();
-        if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        }
-        console.log("Submitted Data:", formData);
-        // Add real API submission logic here
-        setFormData({
-            Name: "",
-            email: "",
-            number: "",
-            password: "",
-            confirmPassword: "",
-            agreeToTerms: false
-        });
-    }
+  if (!values.phone.trim()) {
+    nextErrors.phone = "Phone number is required.";
+  } else if (!phonePattern.test(values.phone.trim())) {
+    nextErrors.phone = "Phone must be 10 to 15 digits.";
+  }
 
-    return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-            {/* Main split-screen card container */}
-            <div className="bg-white rounded-3xl shadow-xl w-full max-w-6xl flex overflow-hidden">
+  if (!values.password) {
+    nextErrors.password = "Password is required.";
+  } else if (values.password.length < 8) {
+    nextErrors.password = "Password must be at least 8 characters.";
+  }
 
-                {/* Left Form Section */}
-                <div className="flex-1 p-16 md:p-24">
-                    <form onSubmit={handleSubmit} className="w-full max-w-sm mx-auto">
-                        {/* Plain Blue Logo Placeholder */}
-                        <div className="bg-blue-600 w-16 h-16 rounded-md mb-8"></div>
+  if (!values.confirmPassword) {
+    nextErrors.confirmPassword = "Confirm your password.";
+  } else if (values.confirmPassword !== values.password) {
+    nextErrors.confirmPassword = "Passwords do not match.";
+  }
 
-                        <h2 className="text-3xl font-bold mb-2 text-gray-800">Create an account</h2>
-                        <p className="text-gray-500 mb-8">Please enter your details to register.</p>
+  if (!values.agreeToTerms) {
+    nextErrors.agreeToTerms = "You must accept the terms.";
+  }
 
-                        <input
-                            placeholder="Name"
-                            value={formData.Name} // Note: Changed to match state case
-                            onChange={handleChange}
-                            name="Name"
-                            className="border border-gray-300 rounded-md p-3 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <input
-                            type="email"
-                            placeholder="Email Address"
-                            value={formData.email}
-                            onChange={handleChange}
-                            name="email"
-                            className="border border-gray-300 rounded-md p-3 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <input
-                            type="number"
-                            placeholder="Mobile Number"
-                            value={formData.number}
-                            onChange={handleChange}
-                            name="number"
-                            className="border border-gray-300 rounded-md p-3 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            name="password"
-                            className="border border-gray-300 rounded-md p-3 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                        <input
-                            type="password"
-                            placeholder="Confirm Password"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            name="confirmPassword"
-                            className="border border-gray-300 rounded-md p-3 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-
-                        <div className="checkbox flex items-center gap-2 mb-6">
-                            <input
-                                type="checkbox"
-                                id="terms"
-                                name="agreeToTerms"
-                                checked={formData.agreeToTerms}
-                                onChange={handleChange}
-                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                            <label htmlFor="terms" className="text-sm text-gray-600">
-                                I agree to the Terms of Service and Privacy Policy.
-                            </label>
-                        </div>
-
-                        <button className="bg-indigo-600 text-white font-bold py-3 rounded-md w-full hover:bg-indigo-700 transition duration-150 flex items-center justify-center gap-2">
-                            Create account →
-                        </button>
-
-                        <p className="login-text text-center text-gray-600 mt-6 text-sm">
-                            Already have an account?{" "}
-                            <a href="#/login" onClick={(e) => { e.preventDefault(); window.location.href="#/login"; window.location.reload(); }} className="font-medium text-blue-600 hover:text-blue-500">
-                                Login
-                            </a>
-                        </p>
-                    </form>
-                </div>
-
-                {/* Right Branding Panel Section */}
-                <div className="flex-1 bg-purple-600 p-16 md:p-24 text-white relative flex flex-col justify-end">
-                    {/* Subtle branding illustration - as a placeholder */}
-                    <div className="absolute inset-x-0 top-0 h-64 border-b border-indigo-500 bg-black bg-opacity-10 m-12 rounded-lg p-6 opacity-30">
-                        {/* Placeholder ceiling light */}
-                        <div className="w-16 h-16 bg-white rounded-full mx-auto -mt-10 opacity-70"></div>
-                    </div>
-
-                    <div className="z-10">
-                        <h1 className="text-4xl font-extrabold mb-4 leading-tight">
-                            Seamless work experience
-                        </h1>
-                        <p className="text-indigo-100 mb-10 text-lg">
-                            Everything you need in an easily customizable dashboard
-                        </p>
-
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-2 bg-white rounded-full"></div>
-                            <div className="w-2 h-2 bg-white bg-opacity-60 rounded-full"></div>
-                            <div className="w-2 h-2 bg-white bg-opacity-60 rounded-full"></div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    );
+  return nextErrors;
 }
+
+function Register() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState(initialForm);
+  const [errors, setErrors] = useState({});
+
+  function handleChange(event) {
+    const { name, value, type, checked } = event.target;
+    const finalValue = type === "checkbox" ? checked : value;
+
+    setFormData((current) => ({ ...current, [name]: finalValue }));
+    setErrors((current) => ({ ...current, [name]: undefined }));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    const nextErrors = validateForm(formData);
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
+    console.log("Registration submitted", formData);
+    navigate("/verification");
+  }
+
+  function handleGoogleSignup() {
+    console.log("Mock Google Signup submitted");
+    navigate("/interviews");
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-100 px-4 py-8 font-sans">
+      <div className="mx-auto w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 shadow-lg md:p-10 lg:p-12">
+        <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md">
+          <h2 className="text-3xl font-bold text-slate-900">Create your account</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            Start practicing interviews with personalized AI coaching.
+          </p>
+
+          <div className="mt-8 space-y-4">
+            <div>
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              />
+              {errors.fullName ? <p className="mt-1 text-xs text-red-600">{errors.fullName}</p> : null}
+            </div>
+
+            <div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              />
+              {errors.email ? <p className="mt-1 text-xs text-red-600">{errors.email}</p> : null}
+            </div>
+
+            <div>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Mobile Number"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              />
+              {errors.phone ? <p className="mt-1 text-xs text-red-600">{errors.phone}</p> : null}
+            </div>
+
+            <div>
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              />
+              {errors.password ? <p className="mt-1 text-xs text-red-600">{errors.password}</p> : null}
+            </div>
+
+            <div>
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              />
+              {errors.confirmPassword ? (
+                <p className="mt-1 text-xs text-red-600">{errors.confirmPassword}</p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <label className="inline-flex items-start gap-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                name="agreeToTerms"
+                checked={formData.agreeToTerms}
+                onChange={handleChange}
+                className="mt-1 h-4 w-4 rounded border-slate-300 text-slate-700 focus:ring-slate-500"
+              />
+              I agree to the Terms of Service and Privacy Policy.
+            </label>
+            {errors.agreeToTerms ? <p className="mt-1 text-xs text-red-600">{errors.agreeToTerms}</p> : null}
+          </div>
+
+          <button
+            type="submit"
+            className="mt-6 w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800"
+          >
+            Create account
+          </button>
+
+          <div className="my-6 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-slate-300 after:mt-0.5 after:flex-1 after:border-t after:border-slate-300">
+            <p className="mx-4 mb-0 text-center text-sm font-medium text-slate-500">
+              OR
+            </p>
+          </div>
+
+          <GoogleAuthButton label="Continue with Google" onClick={handleGoogleSignup} />
+
+          <p className="mt-5 text-center text-sm text-slate-600">
+            Already have an account?{" "}
+            <Link to="/login" className="font-semibold text-slate-700 hover:text-slate-900">
+              Login
+            </Link>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default Register;

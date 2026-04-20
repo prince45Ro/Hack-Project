@@ -75,20 +75,28 @@ export default function Body() {
   ];
 
   const containerVariants = {
-    hidden: {},
+    hidden: { opacity: 0 },
     show: {
+      opacity: 1,
       transition: {
-        staggerChildren: 0.15,
+        staggerChildren: 0.2,
+        delayChildren: 0.1,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 50, scale: 0.95 },
     show: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1.0] },
+      scale: 1,
+      transition: { 
+        type: "spring",
+        stiffness: 70,
+        damping: 15,
+        mass: 1
+      },
     },
   };
 
@@ -108,10 +116,10 @@ export default function Body() {
 
         <div className="relative z-10 max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 1, type: "spring", bounce: 0.3 }}
             className="text-center mb-16"
           >
             <h1 className="text-4xl md:text-6xl font-bold mb-4 text-slate-800 tracking-tight">
@@ -177,10 +185,10 @@ export default function Body() {
 
           {/* Why Choose Us Section Header */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
+            initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 1, type: "spring", bounce: 0.3 }}
             className="text-center mt-24 mb-12"
           >
             <h2 className="text-3xl md:text-5xl font-bold text-slate-800 tracking-tight">
@@ -199,11 +207,16 @@ export default function Body() {
             {whyChooseUs.map((item, idx) => (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, y: 80 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.8, delay: idx * 0.2 }}
-                whileHover={{ scale: 1.02 }}
+                initial={{ opacity: 0, y: 60, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 80, 
+                  damping: 20, 
+                  delay: idx * 0.15 
+                }}
+                whileHover={{ scale: 1.02, y: -5, transition: { type: "spring", stiffness: 300 } }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center px-6 md:px-10 py-10 max-w-7xl mx-auto bg-white/70 backdrop-blur-md border border-white/80 shadow-md rounded-2xl transition-all duration-500"
               >
                 {/* Image (alternate sides) */}
@@ -328,10 +341,10 @@ export default function Body() {
           {/* Crack Interviews Section */}
           <motion.div
             id="features"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 1.2, type: "spring", bounce: 0.3 }}
             className="mt-24 mb-24 scroll-mt-28"
           >
             <div className="max-w-6xl mx-auto text-center">
@@ -383,15 +396,16 @@ export default function Body() {
                 ].map((item, idx) => (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 60, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
                     viewport={{ once: true, margin: "-120px" }}
                     transition={{
-                      duration: 0.6,
-                      delay: idx * 0.08,
-                      ease: "easeOut",
+                      type: "spring",
+                      stiffness: 70,
+                      damping: 20,
+                      delay: idx * 0.1,
                     }}
-                    whileHover={{ y: -4 }}
+                    whileHover={{ y: -6, transition: { type: "spring", stiffness: 300 } }}
                     className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center"
                   >
                     {/* Image Container - only here we apply hover scale */}
