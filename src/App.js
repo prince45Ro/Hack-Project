@@ -14,6 +14,7 @@ import Pricing from "./Components/Pricing";
 import Login from "./Components/login/login.js";
 import Register from "./Components/login/Register.js";
 import Verification from "./Components/login/Verification.js";
+import LeaderboardPage from "./Components/LeaderboardPage";
 import { useLocation } from "react-router-dom";
 
 function ScrollToTop() {
@@ -80,7 +81,7 @@ export function App() {
           <Route path="/verification" element={<Verification />} />
           <Route path="/start" element={<Navigate to="/interviews" replace />} />
           <Route path="/candidates" element={<PlaceholderPage title="Candidates" description="Candidate database and profiles." />} />
-          <Route path="/leaderboard" element={<PlaceholderPage title="Leaderboard" description="Global rankings and top performers." />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<PlaceholderPage title="Settings" description="Configure your AIX dashboard and account settings." />} />
           <Route path="/feature/smart-feedback" element={<PlaceholderPage title="Smart Feedback" description="AI generated smart feedback for your next round." />} />

@@ -134,6 +134,9 @@ export default function Header() {
                   if (item === "Features") {
                     e.preventDefault();
                     document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+                  } else if (item === "Home") {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }
                 }}
                 className="relative px-4 py-2 rounded-full font-medium text-gray-200 bg-transparent transition-all duration-300 hover:bg-gray-800/60 hover:text-white hover:shadow-sm hover:scale-105"
