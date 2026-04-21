@@ -15,6 +15,9 @@ import Login from "./Components/login/login.js";
 import Register from "./Components/login/Register.js";
 import Verification from "./Components/login/Verification.js";
 import LeaderboardPage from "./Components/LeaderboardPage";
+import InterviewSession from "./Components/InterviewSession";
+
+
 import { useLocation } from "react-router-dom";
 
 function ScrollToTop() {
@@ -80,6 +83,11 @@ export function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/verification" element={<Verification />} />
           <Route path="/start" element={<Navigate to="/interviews" replace />} />
+          <Route path="/mock-session" element={<InterviewSession mode="mock" />} />
+          <Route path="/technical-session" element={<InterviewSession mode="technical" />} />
+          <Route path="/hr-session" element={<InterviewSession mode="hr" />} />
+
+
           <Route path="/candidates" element={<PlaceholderPage title="Candidates" description="Candidate database and profiles." />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/analytics" element={<Analytics />} />

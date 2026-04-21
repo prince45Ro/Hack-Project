@@ -102,7 +102,7 @@ export default function Mock() {
           <ul className="space-y-0.5 mb-3">{preList.map((p) => <li key={p} className="text-[11px] text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0" />{p}</li>)}</ul>
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">T&amp;C</p>
           <ul className="space-y-1 mb-4">{tcList.map((tc) => (<li key={tc} className="flex items-start gap-2 text-[11px] text-slate-300"><svg className="w-3 h-3 mt-0.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>{tc}</li>))}</ul>
-          <button onClick={() => setSelected(item)} className="w-full bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold py-3 rounded-2xl text-sm transition-all">
+          <button onClick={() => { if (isCompany || item.isPremium) { setSelected(item); } else { navigate("/mock-session", { state: { interview: { title: item.title, duration: item.duration, questions: item.questions, difficulty: item.difficulty, description: item.description, category: item.category || "Mock" } } }); } }} className="w-full bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold py-3 rounded-2xl text-sm transition-all">
             {isCompany || item.isPremium ? "🔓 Unlock Now" : "▶ Start Mock"}
           </button>
         </div>
@@ -226,7 +226,7 @@ export default function Mock() {
               <div className="flex flex-wrap gap-1.5 mb-5">{selected.topics.map((t) => <span key={t} className="bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full">{t}</span>)}</div>
               <div className="flex gap-3">
                 <button onClick={() => setSelected(null)} className="flex-1 py-3 rounded-2xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all">Cancel</button>
-                <button className="flex-1 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
+                <button onClick={() => { if (!selected.isPremium && !selected.emoji) { setSelected(null); navigate("/mock-session", { state: { interview: { title: selected.title, duration: selected.duration, questions: selected.questions, difficulty: selected.difficulty, description: selected.description, category: selected.category || "Mock" } } }); } }} className="flex-1 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
                   {selected.isPremium || selected.emoji ? "🔓 Unlock & Start" : "▶ Begin Session"}
                 </button>
               </div>

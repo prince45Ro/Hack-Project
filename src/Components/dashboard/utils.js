@@ -98,7 +98,7 @@ export const buildLeaderboard = (records) => {
       };
     })
     .sort((left, right) => right.score - left.score)
-    .slice(0, 5)
+    .slice(0, 100)
     .map((item, index) => ({ ...item, rank: index + 1 }));
 };
 

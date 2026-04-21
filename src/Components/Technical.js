@@ -63,6 +63,11 @@ export default function Technical() {
   const navigate = useNavigate();
   useEffect(()=>{ const t=setTimeout(()=>setVisible(true),50); return()=>clearTimeout(t); },[]);
 
+  const handleSelect = (item, isCompany) => {
+    if ((isCompany || item.isPremium)) { setSelected(item); return; }
+    navigate("/technical-session", { state: { interview: { title: item.title, duration: item.duration, questions: item.questions, difficulty: item.difficulty, description: item.description, category: item.category || "Technical" } } });
+  };
+
   const categories = ["All",...new Set(SKILL_INTERVIEWS.map((i)=>i.category))];
   const skillCards = SKILL_INTERVIEWS.filter((i)=>{
     const plan = filter==="All"||filter==="🏢 Company" ? filter!=="🏢 Company" : (filter==="Free"?!i.isPremium:i.isPremium);
@@ -102,7 +107,7 @@ export default function Technical() {
             {skillCards.map((item,idx)=>(
               <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-slate-50/50 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:border-blue-300 transition-all duration-500 hover:-translate-y-2"
                 style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(32px)",transitionDelay:`${idx*60}ms`,transitionDuration:"500ms",transitionTimingFunction:"cubic-bezier(0.16,1,0.3,1)"}}>
-                <CardPopout item={item} isCompany={false} onSelect={setSelected}/>
+                <CardPopout item={item} isCompany={false} onSelect={(i)=>handleSelect(i,false)}/>
                 {item.isPremium?(<div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>):(<div className="absolute top-4 right-4 z-10 bg-emerald-100 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-emerald-700">Free</div>)}
                 <div className="p-7 flex-1">
                   <div className="text-4xl mb-5">{item.icon}</div>
@@ -115,7 +120,7 @@ export default function Technical() {
                 </div>
                 <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
                   <span className="text-slate-500 text-sm font-medium flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>{item.duration}</span>
-                  <button onClick={()=>setSelected(item)} className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${item.isPremium?"bg-slate-900 text-white hover:bg-slate-800":"bg-blue-600 text-white hover:bg-blue-700"}`}>
+                  <button onClick={()=>handleSelect(item,false)} className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${item.isPremium?"bg-slate-900 text-white hover:bg-slate-800":"bg-blue-600 text-white hover:bg-blue-700"}`}>
                     {item.isPremium?"Unlock Now":"Start Now"}<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                   </button>
                 </div>
@@ -139,7 +144,7 @@ export default function Technical() {
               {COMPANY_INTERVIEWS.map((item,idx)=>(
                 <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-amber-50/30 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(251,191,36,0.15)] hover:border-amber-300 transition-all duration-500 hover:-translate-y-2"
                   style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(32px)",transitionDelay:`${idx*60}ms`,transitionDuration:"500ms"}}>
-                  <CardPopout item={item} isCompany={true} onSelect={setSelected}/>
+                  <CardPopout item={item} isCompany={true} onSelect={(i)=>handleSelect(i,true)}/>
                   <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
                   <div className="p-7 flex-1">
                     <div className="w-16 h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center mb-5 shadow-sm group-hover:scale-110 transition-transform duration-300 overflow-hidden">
@@ -151,7 +156,7 @@ export default function Technical() {
                   </div>
                   <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
                     <span className="text-slate-500 text-sm font-medium flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>{item.duration}</span>
-                    <button onClick={()=>setSelected(item)} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 transition-all flex items-center gap-2">
+                    <button onClick={()=>handleSelect(item,true)} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 transition-all flex items-center gap-2">
                       Unlock Now<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
                   </div>
@@ -191,7 +196,7 @@ export default function Technical() {
               <div className="flex flex-wrap gap-1.5 mb-5">{selected.topics.map((t)=><span key={t} className="bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full">{t}</span>)}</div>
               <div className="flex gap-3">
                 <button onClick={()=>setSelected(null)} className="flex-1 py-3 rounded-2xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all">Cancel</button>
-                <button className="flex-1 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
+                <button onClick={()=>{ if (!selected.isPremium&&!selected.emoji) { setSelected(null); navigate("/technical-session", { state: { interview: { title: selected.title, duration: selected.duration, questions: selected.questions, difficulty: selected.difficulty, description: selected.description, category: selected.category||"Technical" } } }); } }} className="flex-1 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
                   {selected.isPremium||selected.emoji?"🔓 Unlock & Start":"▶ Begin Session"}
                 </button>
               </div>
