@@ -81,15 +81,15 @@ export default function Technical() {
       <div className="transition-all duration-500 ease-out" style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(24px)"}}>
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <button onClick={()=>navigate(-1)} className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 mb-3 transition-colors">
+            <button onClick={()=>navigate(-1)} className="flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-white mb-3 transition-colors">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>Back
             </button>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Technical Interviews</h1>
-            <p className="mt-2 text-slate-500">Hover any card for skills, topics & terms. Click to open session.</p>
+            <h1 className="text-3xl font-bold text-white tracking-tight">Technical Interviews</h1>
+            <p className="mt-2 text-slate-300">Hover any card for skills, topics & terms. Click to open session.</p>
           </div>
-          <div className="inline-flex bg-slate-100 p-1 rounded-xl flex-wrap gap-1">
+          <div className="liquid-glass-chip inline-flex p-1 rounded-xl flex-wrap gap-1">
             {["All","Free","Premium","🏢 Company"].map((tab)=>(
-              <button key={tab} onClick={()=>setFilter(tab)} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${filter===tab?"bg-white text-slate-900 shadow-sm":"text-slate-500 hover:text-slate-700"}`}>{tab}</button>
+              <button key={tab} onClick={()=>setFilter(tab)} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${filter===tab?"bg-white/14 text-white shadow-sm":"text-slate-300 hover:text-white"}`}>{tab}</button>
             ))}
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function Technical() {
         {filter!=="🏢 Company" && (
           <div className="flex flex-wrap gap-2 mb-8">
             {categories.map((cat)=>(
-              <button key={cat} onClick={()=>setCatFilter(cat)} className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${catFilter===cat?"bg-slate-900 text-white border-slate-900":"bg-white text-slate-500 border-slate-200 hover:border-slate-400"}`}>{cat}</button>
+              <button key={cat} onClick={()=>setCatFilter(cat)} className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${catFilter===cat?"bg-white/14 text-white border-white/16":"liquid-glass-chip text-slate-300 border-white/10"}`}>{cat}</button>
             ))}
           </div>
         )}
@@ -105,22 +105,22 @@ export default function Technical() {
         {skillCards.length>0 && (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-4">
             {skillCards.map((item,idx)=>(
-              <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-slate-50/50 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] hover:border-blue-300 transition-all duration-500 hover:-translate-y-2"
+              <div key={item.id} className="liquid-glass-card group relative flex flex-col rounded-[32px] overflow-hidden hover:border-blue-300/40 transition-all duration-500 hover:-translate-y-2"
                 style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(32px)",transitionDelay:`${idx*60}ms`,transitionDuration:"500ms",transitionTimingFunction:"cubic-bezier(0.16,1,0.3,1)"}}>
                 <CardPopout item={item} isCompany={false} onSelect={(i)=>handleSelect(i,false)}/>
                 {item.isPremium?(<div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>):(<div className="absolute top-4 right-4 z-10 bg-emerald-100 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-emerald-700">Free</div>)}
                 <div className="p-7 flex-1">
                   <div className="text-4xl mb-5">{item.icon}</div>
                   <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">{item.category}</div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed mb-4">{item.description}</p>
+                  <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                  <p className="text-sm text-slate-300 leading-relaxed mb-4">{item.description}</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {item.skills.slice(0,3).map((s)=><span key={s} className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full">{s}</span>)}
+                    {item.skills.slice(0,3).map((s)=><span key={s} className="liquid-glass-chip text-[10px] font-bold text-cyan-100 px-2.5 py-1 rounded-full">{s}</span>)}
                   </div>
                 </div>
-                <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                  <span className="text-slate-500 text-sm font-medium flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>{item.duration}</span>
-                  <button onClick={()=>handleSelect(item,false)} className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${item.isPremium?"bg-slate-900 text-white hover:bg-slate-800":"bg-blue-600 text-white hover:bg-blue-700"}`}>
+                <div className="p-5 border-t border-white/10 bg-white/4 flex items-center justify-between">
+                  <span className="text-slate-300 text-sm font-medium flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>{item.duration}</span>
+                  <button onClick={()=>handleSelect(item,false)} className="liquid-glass-button px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                     {item.isPremium?"Unlock Now":"Start Now"}<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                   </button>
                 </div>
@@ -132,31 +132,31 @@ export default function Technical() {
         {showCompany && (
           <div className="mt-10">
             <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 h-px bg-slate-200"/>
-              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-4 py-2 rounded-full">
-                <span>🏢</span><span className="text-sm font-black text-amber-700 uppercase tracking-wider">Company Technical Rounds</span>
+              <div className="flex-1 h-px bg-white/10"/>
+              <div className="liquid-glass-chip flex items-center gap-2 px-4 py-2 rounded-full">
+                <span>🏢</span><span className="text-sm font-black text-amber-300 uppercase tracking-wider">Company Technical Rounds</span>
                 
               </div>
-              <div className="flex-1 h-px bg-slate-200"/>
+              <div className="flex-1 h-px bg-white/10"/>
             </div>
-            <p className="text-sm text-slate-500 text-center mb-8">Company-specific technical interview simulations based on real hiring patterns.</p>
+            <p className="text-sm text-slate-300 text-center mb-8">Company-specific technical interview simulations based on real hiring patterns.</p>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
               {COMPANY_INTERVIEWS.map((item,idx)=>(
-                <div key={item.id} className="group relative flex flex-col bg-gradient-to-b from-white to-amber-50/30 rounded-[32px] border border-slate-200 overflow-hidden hover:shadow-[0_20px_60px_-15px_rgba(251,191,36,0.15)] hover:border-amber-300 transition-all duration-500 hover:-translate-y-2"
+                <div key={item.id} className="liquid-glass-card group relative flex flex-col rounded-[32px] overflow-hidden hover:border-amber-300/40 transition-all duration-500 hover:-translate-y-2"
                   style={{opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(32px)",transitionDelay:`${idx*60}ms`,transitionDuration:"500ms"}}>
                   <CardPopout item={item} isCompany={true} onSelect={(i)=>handleSelect(i,true)}/>
                   <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 px-3 py-1.5 rounded-full text-[10px] font-black uppercase text-white shadow-sm">⭐ Premium</div>
                   <div className="p-7 flex-1">
-                    <div className="w-16 h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center mb-5 shadow-sm group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+                    <div className="liquid-glass-chip w-16 h-16 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                       {item.logo ? <img src={item.logo} alt={item.title} className="w-10 h-10 object-contain" onError={(e)=>{e.target.replaceWith(Object.assign(document.createElement('span'),{textContent:item.emoji||'🏢',className:'text-3xl'}))}} /> : <span className="text-3xl">{item.emoji}</span>}
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title} Technical Interview</h3>
-                    <p className="text-sm text-slate-500 leading-relaxed mb-3">{item.description}</p>
-                    <div className="flex flex-wrap gap-1.5">{item.skills.slice(0,3).map((s)=><span key={s} className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">{s}</span>)}</div>
+                    <h3 className="text-xl font-bold text-white mb-3">{item.title} Technical Interview</h3>
+                    <p className="text-sm text-slate-300 leading-relaxed mb-3">{item.description}</p>
+                    <div className="flex flex-wrap gap-1.5">{item.skills.slice(0,3).map((s)=><span key={s} className="liquid-glass-chip text-[10px] font-bold text-slate-200 px-2.5 py-1 rounded-full">{s}</span>)}</div>
                   </div>
-                  <div className="p-5 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                    <span className="text-slate-500 text-sm font-medium flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>{item.duration}</span>
-                    <button onClick={()=>handleSelect(item,true)} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 transition-all flex items-center gap-2">
+                  <div className="p-5 border-t border-white/10 bg-white/4 flex items-center justify-between">
+                    <span className="text-slate-300 text-sm font-medium flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>{item.duration}</span>
+                    <button onClick={()=>handleSelect(item,true)} className="liquid-glass-button px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
                       Unlock Now<svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
                   </div>
@@ -169,7 +169,7 @@ export default function Technical() {
 
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
+          <div className="liquid-glass-modal rounded-3xl w-full max-w-lg overflow-hidden">
             <div className="bg-slate-900 px-7 py-6">
               <div className="flex items-start justify-between">
                 <div>
@@ -190,13 +190,13 @@ export default function Technical() {
               </div>
             </div>
             <div className="p-7">
-              <p className="text-slate-600 text-sm leading-relaxed mb-5">{selected.description}</p>
+              <p className="text-slate-200 text-sm leading-relaxed mb-5">{selected.description}</p>
               {selected.skills && <><p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Key Skills</p><div className="flex flex-wrap gap-1.5 mb-5">{selected.skills.map((s)=><span key={s} className="bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">{s}</span>)}</div></>}
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Topics</p>
-              <div className="flex flex-wrap gap-1.5 mb-5">{selected.topics.map((t)=><span key={t} className="bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full">{t}</span>)}</div>
+              <div className="flex flex-wrap gap-1.5 mb-5">{selected.topics.map((t)=><span key={t} className="liquid-glass-chip text-slate-200 text-xs font-semibold px-3 py-1 rounded-full">{t}</span>)}</div>
               <div className="flex gap-3">
-                <button onClick={()=>setSelected(null)} className="flex-1 py-3 rounded-2xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all">Cancel</button>
-                <button onClick={()=>{ if (!selected.isPremium&&!selected.emoji) { setSelected(null); navigate("/technical-session", { state: { interview: { title: selected.title, duration: selected.duration, questions: selected.questions, difficulty: selected.difficulty, description: selected.description, category: selected.category||"Technical" } } }); } }} className="flex-1 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
+                <button onClick={()=>setSelected(null)} className="liquid-glass-chip flex-1 py-3 rounded-2xl text-slate-100 font-bold text-sm transition-all">Cancel</button>
+                <button onClick={()=>{ if (!selected.isPremium&&!selected.emoji) { setSelected(null); navigate("/technical-session", { state: { interview: { title: selected.title, duration: selected.duration, questions: selected.questions, difficulty: selected.difficulty, description: selected.description, category: selected.category||"Technical" } } }); } }} className="liquid-glass-button flex-1 py-3 rounded-2xl text-white font-bold text-sm transition-all">
                   {selected.isPremium||selected.emoji?"🔓 Unlock & Start":"▶ Begin Session"}
                 </button>
               </div>

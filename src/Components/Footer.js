@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
-    <footer className="bg-slate-200 mt-0 px-6">
-      <div className="max-w-7xl mx-auto px-8 py-14">
+    <footer className="mt-0 px-6 pb-8">
+      <div className="liquid-glass-card max-w-7xl mx-auto rounded-[32px] px-8 py-14">
 
         {/* Top Section */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -11,7 +11,7 @@ export default function Footer() {
             <h2 className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-amber-500 to-yellow-500">
               AI Interviewer
             </h2>
-            <p className="text-slate-700 mt-3 text-sm leading-relaxed">
+            <p className="text-slate-300 mt-3 text-sm leading-relaxed">
               Practice real-time interviews, improve communication skills,
               and land your dream job with confidence.
             </p>
@@ -22,8 +22,8 @@ export default function Footer() {
 
           {/* Links */}
           <div className="transition-all duration-300 hover:-translate-y-1">
-            <h3 className="text-slate-800 font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm text-slate-600">
+            <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+            <ul className="space-y-2 text-sm text-slate-300">
               <li className="hover:text-amber-500 transition-all duration-300 hover:translate-x-1 cursor-pointer">Home</li>
               <li className="hover:text-amber-500 transition-all duration-300 hover:translate-x-1 cursor-pointer">Features</li>
               <li className="hover:text-amber-500 transition-all duration-300 hover:translate-x-1 cursor-pointer">Pricing</li>
@@ -33,8 +33,8 @@ export default function Footer() {
 
           {/* Resources */}
           <div className="transition-all duration-300 hover:-translate-y-1">
-            <h3 className="text-slate-800 font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2 text-sm text-slate-600">
+            <h3 className="text-white font-semibold mb-4">Resources</h3>
+            <ul className="space-y-2 text-sm text-slate-300">
               <li className="hover:text-amber-500 transition-all duration-300 hover:translate-x-1 cursor-pointer">Blog</li>
               <li className="hover:text-amber-500 transition-all duration-300 hover:translate-x-1 cursor-pointer">Help Center</li>
               <li className="hover:text-amber-500 transition-all duration-300 hover:translate-x-1 cursor-pointer">Privacy Policy</li>
@@ -44,8 +44,8 @@ export default function Footer() {
 
           {/* Social */}
           <div className="transition-all duration-300 hover:-translate-y-1">
-            <h3 className="text-slate-800 font-semibold mb-4">Connect</h3>
-            <div className="flex gap-6 text-slate-600 items-center">
+            <h3 className="text-white font-semibold mb-4">Connect</h3>
+            <div className="flex gap-6 text-slate-300 items-center">
               <span className="flex items-center gap-2 hover:text-amber-500 transition cursor-pointer">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 5.92c-.77.35-1.6.58-2.46.69a4.3 4.3 0 0 0 1.88-2.37c-.83.5-1.75.86-2.73 1.06A4.28 4.28 0 0 0 11.1 9.03c0 .34.04.67.1.98A12.13 12.13 0 0 1 3.16 5.1a4.28 4.28 0 0 0 1.32 5.7 4.26 4.26 0 0 1-1.94-.54v.06c0 2.08 1.48 3.82 3.44 4.22-.36.1-.74.15-1.13.15-.28 0-.54-.03-.8-.07a4.29 4.29 0 0 0 4 2.98A8.6 8.6 0 0 1 2 19.54 12.14 12.14 0 0 0 8.29 21c7.55 0 11.68-6.26 11.68-11.68 0-.18 0-.35-.01-.53A8.33 8.33 0 0 0 22 5.92z"/></svg>
                 Twitter
@@ -64,7 +64,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-slate-300 mt-12 pt-6 text-center text-sm text-slate-600 tracking-wide">
+        <div className="border-t border-white/10 mt-12 pt-6 text-center text-sm text-slate-300 tracking-wide">
           © {new Date().getFullYear()} AI Interviewer. All rights reserved.
         </div>
 

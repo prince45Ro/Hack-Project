@@ -76,7 +76,7 @@ export default function FlexibleDashboard() {
   const headerActions = (
     <button
       type="button"
-      className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700"
+      className="liquid-glass-chip flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-slate-100"
       onClick={() => console.log("Role Dropdown Clicked")}
     >
       {selectedRole}
@@ -117,14 +117,14 @@ export default function FlexibleDashboard() {
     >
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between mb-6">
         <div>
-          <h1 className="mt-2 text-[30px] font-bold tracking-tight text-slate-900">
+          <h1 className="mt-2 text-[30px] font-bold tracking-tight text-white">
             My Website Name
           </h1>
         </div>
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
-            className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700"
+            className="liquid-glass-chip flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-slate-100"
             onClick={() => console.log("Time Filter Clicked")}
           >
             Last 14 days
@@ -132,7 +132,7 @@ export default function FlexibleDashboard() {
           </button>
           <button
             type="button"
-            className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700"
+            className="liquid-glass-chip flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-slate-100"
             onClick={() => console.log("Filter Clicked")}
           >
             Filter

@@ -66,11 +66,11 @@ export default function Pricing() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans">
       {/* Fixed 3D Glassy Navbar */}
       <div className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-4 transition-all duration-300">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center bg-gray-900/50 backdrop-blur-2xl border border-gray-700/50 shadow-[0_15px_35px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,0.15),inset_0_-3px_5px_rgba(0,0,0,0.3)] rounded-full px-8 py-3 transition-all duration-300">
+          <div className="liquid-glass-nav flex justify-between items-center rounded-full px-8 py-3 transition-all duration-300">
             <Link to="/" onClick={() => window.scrollTo(0,0)} className="text-3xl font-extrabold tracking-tight text-white hover:opacity-80 transition-opacity">
               AIX
             </Link>
@@ -87,20 +87,20 @@ export default function Pricing() {
                       setTimeout(() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" }), 150);
                     }
                   }}
-                  className="relative px-4 py-2 rounded-full font-medium text-gray-200 bg-transparent transition-all duration-300 hover:bg-gray-800/60 hover:text-white hover:shadow-sm hover:scale-105"
+                  className="liquid-glass-chip relative rounded-full px-4 py-2 font-medium text-gray-200 transition-all duration-300 hover:text-white hover:shadow-sm hover:scale-105"
                 >
                   {item}
                 </Link>
               ))}
               <a
                 href="#/login"
-                className="px-6 py-2.5 rounded-full font-semibold bg-white/10 backdrop-blur-2xl border border-white/30 text-white shadow-[0_4px_15px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.4)] transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.6)] ml-2"
+                className="liquid-glass-button ml-2 rounded-full px-6 py-2.5 font-semibold text-white transition-all duration-300 hover:-translate-y-0.5"
               >
                 Login / SignUp
               </a>
             </nav>
 
-            <button className="md:hidden p-2 rounded-lg bg-slate-800/80 backdrop-blur-sm border border-slate-700 hover:bg-slate-700 transition-all duration-300">
+            <button className="liquid-glass-chip md:hidden rounded-lg p-2 transition-all duration-300">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
@@ -111,10 +111,10 @@ export default function Pricing() {
 
       {/* Pricing Header */}
       <div className="pt-20 pb-16 px-6 text-center">
-        <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-4 tracking-tight">
-          Simple, transparent <span className="bg-clip-text text-transparent bg-linear-to-r from-cyan-500 to-blue-600">pricing</span>
+        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 tracking-tight">
+          Simple, transparent <span className="bg-clip-text text-transparent bg-linear-to-r from-cyan-300 to-blue-400">pricing</span>
         </h1>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+        <p className="text-lg text-slate-300 max-w-2xl mx-auto">
           Choose the plan that best fits your interview preparation needs. No hidden fees.
         </p>
       </div>
@@ -125,7 +125,7 @@ export default function Pricing() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative bg-white rounded-3xl border ${plan.popular ? 'border-blue-400 shadow-2xl shadow-blue-500/10 md:-translate-y-4' : 'border-slate-200 shadow-lg'} p-8 flex flex-col h-full transition-transform duration-300 hover:-translate-y-2`}
+              className={`liquid-glass-card relative rounded-3xl p-8 flex flex-col h-full transition-transform duration-300 hover:-translate-y-2 ${plan.popular ? 'border-blue-300/40 md:-translate-y-4' : ''}`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-linear-to-r from-cyan-500 to-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">
@@ -134,13 +134,13 @@ export default function Pricing() {
               )}
               
               <div className="mb-6">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
-                <p className="text-slate-500 text-sm h-10">{plan.description}</p>
+                <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                <p className="text-slate-300 text-sm h-10">{plan.description}</p>
               </div>
 
               <div className="mb-8">
-                <span className="text-4xl font-extrabold text-slate-900">{plan.price}</span>
-                {plan.period && <span className="text-slate-500 font-medium">{plan.period}</span>}
+                <span className="text-4xl font-extrabold text-white">{plan.price}</span>
+                {plan.period && <span className="text-slate-300 font-medium">{plan.period}</span>}
               </div>
 
               <ul className="space-y-4 mb-8 flex-1">
@@ -149,7 +149,7 @@ export default function Pricing() {
                     <svg className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-slate-700 text-sm font-medium">{feature}</span>
+                    <span className="text-slate-200 text-sm font-medium">{feature}</span>
                   </li>
                 ))}
               </ul>

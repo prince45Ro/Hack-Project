@@ -1,62 +1,196 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import DashboardLayout from "./dashboard/DashboardLayout";
-import { navItems, aiShortcuts } from "./dashboard/data";
 import { INTERVIEW_QUESTION_BANK, inferInterviewScenario } from "../data/interviewQuestionBank";
 
-const THEMES = {
-  mock: { gradient: "from-sky-500 to-blue-600", lightBg: "bg-sky-50", lightBorder: "border-sky-200", lightText: "text-sky-700", badge: "bg-sky-100 text-sky-700 border-sky-200", label: "Mock Interview", icon: "🎯" },
-  technical: { gradient: "from-indigo-500 to-violet-600", lightBg: "bg-indigo-50", lightBorder: "border-indigo-200", lightText: "text-indigo-700", badge: "bg-indigo-100 text-indigo-700 border-indigo-200", label: "Technical Interview", icon: "💻" },
-  hr: { gradient: "from-emerald-500 to-teal-600", lightBg: "bg-emerald-50", lightBorder: "border-emerald-200", lightText: "text-emerald-700", badge: "bg-emerald-100 text-emerald-700 border-emerald-200", label: "HR Interview", icon: "🤝" },
+const MODE_META = {
+  mock: { label: "Mock Interview", track: "MOCK", icon: "🎯" },
+  technical: { label: "Technical Interview", track: "TECHNICAL", icon: "💻" },
+  hr: { label: "HR Interview", track: "HR", icon: "🤝" },
 };
 
-function Panel({ children, className = "" }) {
-  return <div className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.12)] ${className}`}>{children}</div>;
-}
-function Badge({ children, className = "" }) {
-  return <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${className}`}>{children}</span>;
-}
-function formatFileSize(b) { return b < 1024 ? b+" B" : b < 1048576 ? (b/1024).toFixed(1)+" KB" : (b/1048576).toFixed(1)+" MB"; }
-
 const HISTORY_KEY = "aix_session_history_";
-function loadHistory(m) { try { return JSON.parse(localStorage.getItem(HISTORY_KEY+m)) || []; } catch { return []; } }
-function saveHistory(m, h) { try { localStorage.setItem(HISTORY_KEY+m, JSON.stringify(h.slice(-50))); } catch {} }
+function loadHistory(m) { try { return JSON.parse(localStorage.getItem(HISTORY_KEY + m)) || []; } catch { return []; } }
+function saveHistory(m, h) { try { localStorage.setItem(HISTORY_KEY + m, JSON.stringify(h.slice(-50))); } catch {} }
+
+const AI_INTERVIEWER_SPLINE_URL = "https://prod.spline.design/90lsZuOZPb5BzOOC/scene.splinecode";
 
 /* TTS */
+function pickNaturalVoice() {
+  if (!window.speechSynthesis) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices?.length) return null;
+  const indianMaleHints = [
+    /Ravi/i,
+    /Prabhat/i,
+    /Aarav/i,
+    /Karan/i,
+    /Male/i,
+    /Man/i,
+    /Google English India/i,
+    /Microsoft.*India/i,
+  ];
+  const naturalHints = [/Neural/i, /Natural/i, /Premium/i, /Enhanced/i];
+
+  const indianLocalMale = voices.find(
+    (v) =>
+      v.localService &&
+      v.lang?.toLowerCase().startsWith("en-in") &&
+      indianMaleHints.some((pattern) => pattern.test(v.name))
+  );
+  if (indianLocalMale) return indianLocalMale;
+
+  const indianMaleNatural = voices.find(
+    (v) =>
+      v.localService &&
+      v.lang?.toLowerCase().startsWith("en-in") &&
+      indianMaleHints.some((pattern) => pattern.test(v.name)) &&
+      naturalHints.some((pattern) => pattern.test(v.name))
+  );
+  if (indianMaleNatural) return indianMaleNatural;
+
+  const indianMaleAny = voices.find(
+    (v) =>
+      v.lang?.toLowerCase().startsWith("en-in") &&
+      indianMaleHints.some((pattern) => pattern.test(v.name))
+  );
+  if (indianMaleAny) return indianMaleAny;
+
+  const indianAny = voices.find((v) => v.lang?.toLowerCase().startsWith("en-in"));
+  if (indianAny) return indianAny;
+
+  const enUS = voices.find((v) => v.lang?.toLowerCase().startsWith("en-us"));
+  const enAny = voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
+  return enUS || enAny || voices[0];
+}
+
+function toNaturalSpeechText(text) {
+  if (!text) return "";
+  return text
+    .replace(/\s+/g, " ")
+    .replace(/\s*[:;]\s*/g, ", ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function getVoiceLockLabel() {
+  const selected = pickNaturalVoice();
+  return selected?.name ? `${selected.name} (${selected.lang || "unknown"})` : "No voice detected";
+}
+
 function speakText(text, onEnd) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.95; u.pitch = 1; u.lang = "en-US";
+  const u = new SpeechSynthesisUtterance(toNaturalSpeechText(text));
+  const selectedVoice = pickNaturalVoice();
+  u.voice = selectedVoice;
+  u.rate = 0.9;
+  u.pitch = 0.9;
+  u.volume = 1;
+  u.lang = "en-IN";
+  u.voiceURI = u.voice?.voiceURI || "";
   if (onEnd) u.onend = onEnd;
   window.speechSynthesis.speak(u);
+  return selectedVoice;
 }
 function stopSpeaking() { if (window.speechSynthesis) window.speechSynthesis.cancel(); }
 
 /* STT */
 const SpeechRecognition = typeof window !== "undefined" ? (window.SpeechRecognition || window.webkitSpeechRecognition) : null;
 
+function hideSplineBranding(root) {
+  if (!root?.querySelectorAll) return;
+  const selectors = [
+    "a[href*='spline.design']", "a[aria-label*='Spline']", "a[title*='Spline']",
+    "[part='logo']", "[part='watermark']", "[part='badge']", "[part='branding']",
+    "[id*='logo']", "[id*='watermark']", "[class*='logo']", "[class*='watermark']",
+  ];
+  root.querySelectorAll(selectors.join(", ")).forEach((node) => {
+    const sig = [node.textContent, node.getAttribute?.("href"), node.getAttribute?.("aria-label"),
+      node.getAttribute?.("title"), node.id, typeof node.className === "string" ? node.className : ""]
+      .filter(Boolean).join(" ").toLowerCase();
+    if (!sig.includes("spline") && !sig.includes("logo") && !sig.includes("watermark")) return;
+    node.setAttribute("hidden", "");
+    node.style.setProperty("display", "none", "important");
+    node.style.setProperty("visibility", "hidden", "important");
+    node.style.setProperty("opacity", "0", "important");
+    node.style.setProperty("pointer-events", "none", "important");
+  });
+}
+
+/* ── Spline 3D Orb ── */
+function SplineOrb() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const v = ref.current; if (!v) return;
+    let ho, so, a = 0;
+    const sync = () => { hideSplineBranding(v); if (v.shadowRoot) { hideSplineBranding(v.shadowRoot); if (!so) { so = new MutationObserver(() => hideSplineBranding(v.shadowRoot)); so.observe(v.shadowRoot, { childList: true, subtree: true }); } } };
+    ho = new MutationObserver(sync); ho.observe(v, { childList: true, subtree: true }); sync();
+    const iv = setInterval(() => { a++; sync(); if (v.shadowRoot && a >= 8) clearInterval(iv); }, 500);
+    const to = setTimeout(() => clearInterval(iv), 12000);
+    return () => { ho?.disconnect(); so?.disconnect(); clearInterval(iv); clearTimeout(to); };
+  }, []);
+  return <spline-viewer ref={ref} url={AI_INTERVIEWER_SPLINE_URL} className="arena-spline-viewer" />;
+}
+
+/* ── Timer Hook ── */
+function useTimer() {
+  const [seconds, setSeconds] = useState(0);
+  const running = useRef(true);
+  useEffect(() => {
+    const id = setInterval(() => { if (running.current) setSeconds(s => s + 1); }, 1000);
+    return () => clearInterval(id);
+  }, []);
+  const pause = () => { running.current = false; };
+  const resume = () => { running.current = true; };
+  const reset = () => setSeconds(0);
+  const fmt = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+  return { seconds, fmt, pause, resume, reset };
+}
+
+/* ── Fake live metrics ── */
+function useMetrics(answer) {
+  const words = (answer || "").trim().split(/\s+/).filter(Boolean).length;
+  const clarity = Math.min(99, 60 + Math.floor(words * 1.2));
+  const pace = Math.min(99, 55 + Math.floor(words * 0.8));
+  const signal = Math.min(99, 45 + Math.floor(words * 1.5));
+  return { clarity, pace, signal, words };
+}
+
+/* ════════════════════════════════════════════════
+   MAIN COMPONENT
+   ════════════════════════════════════════════════ */
 export default function InterviewSession({ mode = "mock" }) {
-  const theme = THEMES[mode] || THEMES.mock;
+  const meta = MODE_META[mode] || MODE_META.mock;
   const navigate = useNavigate();
   const location = useLocation();
   const interview = location.state?.interview;
-
-  const iv = interview || { title: theme.label, duration: "45 mins", questions: 12, difficulty: "Intermediate", description: "AI-guided interview practice.", category: mode === "hr" ? "HR" : mode === "technical" ? "Technical" : "Mock" };
+  const userProfileImage = location.state?.user?.photoURL || "";
+  const userDisplayName = location.state?.user?.name || "User";
+  const iv = interview || { title: meta.label, duration: "45 mins", questions: 12, difficulty: "Intermediate", description: "AI-guided interview practice.", category: mode === "hr" ? "HR" : mode === "technical" ? "Technical" : "Mock" };
 
   const [questions, setQuestions] = useState([]);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [phase, setPhase] = useState("prep"); // "prep" | "interview" | "review"
+  const [phase, setPhase] = useState("prep");
   const [userAnswers, setUserAnswers] = useState([]);
-  const [resume, setResume] = useState(null);
-  const [dragOver, setDragOver] = useState(false);
   const [history, setHistory] = useState(() => loadHistory(mode));
   const [expandedReview, setExpandedReview] = useState(null);
-  const [visible, setVisible] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState("");
+  const [isSplineExpanded, setIsSplineExpanded] = useState(false);
+  const [micEnabled, setMicEnabled] = useState(true);
+  const [cameraEnabled, setCameraEnabled] = useState(true);
+  const [voiceLockLabel, setVoiceLockLabel] = useState("Detecting voice...");
+  const [resumeFileName, setResumeFileName] = useState("");
+  const [cameraReady, setCameraReady] = useState(false);
+  const [cameraError, setCameraError] = useState("");
   const recognitionRef = useRef(null);
+  const manualStopRef = useRef(false);
+  const restartTimeoutRef = useRef(null);
+  const userVideoRef = useRef(null);
+  const cameraStreamRef = useRef(null);
+  const timer = useTimer();
+  const userInitial = (userDisplayName || "U").trim().charAt(0).toUpperCase();
 
   useEffect(() => {
     const scenarioKey = inferInterviewScenario(iv);
@@ -69,27 +203,91 @@ export default function InterviewSession({ mode = "mock" }) {
     setPhase("prep");
   }, [iv.title, iv.category]);
 
-  useEffect(() => { const t = setTimeout(() => setVisible(true), 60); return () => clearTimeout(t); }, []);
-  useEffect(() => { return () => { stopSpeaking(); if (recognitionRef.current) recognitionRef.current.abort(); }; }, []);
+  useEffect(() => {
+    return () => {
+      stopSpeaking();
+      if (restartTimeoutRef.current) {
+        clearTimeout(restartTimeoutRef.current);
+        restartTimeoutRef.current = null;
+      }
+      if (recognitionRef.current) recognitionRef.current.abort();
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach((track) => track.stop());
+        cameraStreamRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!window.speechSynthesis) {
+      setVoiceLockLabel("Speech synthesis not supported");
+      return;
+    }
+    const syncVoice = () => setVoiceLockLabel(getVoiceLockLabel());
+    syncVoice();
+    window.speechSynthesis.onvoiceschanged = syncVoice;
+    return () => {
+      if (window.speechSynthesis.onvoiceschanged === syncVoice) {
+        window.speechSynthesis.onvoiceschanged = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    async function startCameraPreview() {
+      if (!isSplineExpanded || !cameraEnabled || !navigator.mediaDevices?.getUserMedia) {
+        if (cameraStreamRef.current) {
+          cameraStreamRef.current.getTracks().forEach((track) => track.stop());
+          cameraStreamRef.current = null;
+        }
+        if (userVideoRef.current) userVideoRef.current.srcObject = null;
+        setCameraReady(false);
+        setCameraError("");
+        return;
+      }
+      try {
+        if (cameraStreamRef.current) {
+          cameraStreamRef.current.getTracks().forEach((track) => track.stop());
+          cameraStreamRef.current = null;
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        if (!mounted) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        cameraStreamRef.current = stream;
+        const videoEl = userVideoRef.current;
+        if (videoEl) {
+          videoEl.srcObject = stream;
+          await videoEl.play().catch(() => {});
+        }
+        setCameraReady(stream.getVideoTracks().some((track) => track.readyState === "live"));
+        setCameraError("");
+      } catch {
+        setCameraReady(false);
+        setCameraError("Camera unavailable");
+      }
+    }
+    startCameraPreview();
+    return () => { mounted = false; };
+  }, [isSplineExpanded, cameraEnabled]);
 
   const currentQ = questions[currentIdx] || null;
   const progress = questions.length ? ((currentIdx + 1) / questions.length) * 100 : 0;
+  const metrics = useMetrics(userAnswers[currentIdx]);
 
-  /* Speak question */
-  const speakQuestion = useCallback(() => {
-    if (!currentQ) return;
-    setIsSpeaking(true);
-    speakText(`Question ${currentIdx + 1}. ${currentQ.question}`, () => setIsSpeaking(false));
-  }, [currentQ, currentIdx]);
-
-  /* Auto-speak on question change */
-  useEffect(() => { if (phase === "interview" && currentQ) speakQuestion(); }, [currentIdx, phase]);
-
-  /* Voice recording */
   const startRecording = () => {
-    if (!SpeechRecognition) { alert("Speech recognition not supported in this browser. Please use Chrome."); return; }
+    if (!micEnabled) { alert("Mic is turned off. Enable mic first."); return; }
+    if (!SpeechRecognition) { alert("Speech recognition not supported. Please use Chrome."); return; }
+    if (isRecording) return;
+    manualStopRef.current = false;
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current);
+      restartTimeoutRef.current = null;
+    }
     const recognition = new SpeechRecognition();
-    recognition.continuous = true; recognition.interimResults = true; recognition.lang = "en-US";
+    recognition.continuous = true; recognition.interimResults = true; recognition.lang = "en-IN";
     let finalTranscript = userAnswers[currentIdx] || "";
     recognition.onresult = (e) => {
       let interim = "";
@@ -98,10 +296,28 @@ export default function InterviewSession({ mode = "mock" }) {
         else interim += e.results[i][0].transcript;
       }
       setCurrentTranscript(finalTranscript + interim);
-      setUserAnswers(prev => { const n = [...prev]; n[currentIdx] = finalTranscript.trim(); return n; });
+      setUserAnswers(prev => {
+        const n = [...prev];
+        n[currentIdx] = (finalTranscript + interim).trim();
+        return n;
+      });
     };
-    recognition.onerror = () => setIsRecording(false);
-    recognition.onend = () => setIsRecording(false);
+    recognition.onerror = (event) => {
+      setIsRecording(false);
+      recognitionRef.current = null;
+      if (event?.error === "not-allowed" || event?.error === "service-not-allowed") {
+        manualStopRef.current = true;
+      }
+    };
+    recognition.onend = () => {
+      setIsRecording(false);
+      recognitionRef.current = null;
+      if (!manualStopRef.current && micEnabled && phase === "interview") {
+        restartTimeoutRef.current = setTimeout(() => {
+          if (!manualStopRef.current && micEnabled && phase === "interview") startRecording();
+        }, 250);
+      }
+    };
     recognitionRef.current = recognition;
     recognition.start();
     setIsRecording(true);
@@ -109,73 +325,99 @@ export default function InterviewSession({ mode = "mock" }) {
   };
 
   const stopRecording = () => {
+    manualStopRef.current = true;
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current);
+      restartTimeoutRef.current = null;
+    }
+    setUserAnswers(prev => {
+      const n = [...prev];
+      n[currentIdx] = (currentTranscript || n[currentIdx] || "").trim();
+      return n;
+    });
     if (recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null; }
     setIsRecording(false);
   };
 
+  const speakQuestion = useCallback(() => {
+    if (!currentQ) return;
+    setIsSpeaking(true);
+    const activeVoice = speakText(currentQ.question, () => {
+      setIsSpeaking(false);
+    });
+    if (activeVoice?.name) {
+      setVoiceLockLabel(`${activeVoice.name} (${activeVoice.lang || "unknown"})`);
+    }
+  }, [currentQ]);
+
+  useEffect(() => { if (phase === "interview" && currentQ) speakQuestion(); }, [currentIdx, phase]);
+
   const goNext = () => {
-    stopSpeaking(); stopRecording();
+    stopSpeaking(); stopRecording(); timer.reset();
     if (currentIdx < questions.length - 1) { setCurrentIdx(i => i + 1); setCurrentTranscript(""); }
   };
+
   const goPrev = () => {
-    stopSpeaking(); stopRecording();
+    stopSpeaking(); stopRecording(); timer.reset();
     if (currentIdx > 0) { setCurrentIdx(i => i - 1); setCurrentTranscript(""); }
   };
 
   const finishInterview = () => {
-    stopSpeaking(); stopRecording();
+    stopSpeaking(); stopRecording(); timer.pause();
     const sessionEntry = questions.map((q, i) => ({ ...q, userAnswer: userAnswers[i] || "", timestamp: Date.now() }));
     setHistory(prev => { const next = [...prev, ...sessionEntry]; saveHistory(mode, next); return next; });
     setPhase("review");
   };
 
-  /* Resume */
-  const handleFile = (file) => {
-    if (!file) return;
-    if (!file.name.match(/\.(pdf|doc|docx)$/i)) { alert("Please upload a PDF or DOC/DOCX file."); return; }
-    setResume({ name: file.name, size: file.size });
-  };
-
   /* ─── REVIEW PHASE ─── */
   if (phase === "review") {
     return (
-      <DashboardLayout projectName="AIX" projectSubtitle="Interview AI" navItems={navItems} activeNav="Interviews" setActiveNav={() => {}} aiShortcuts={aiShortcuts}>
-        <div className="transition-all duration-500" style={{ opacity: visible ? 1 : 0 }}>
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3"><span className="text-2xl">{theme.icon}</span><h1 className="text-2xl font-bold text-slate-900">{iv.title} — Review</h1></div>
-              <p className="mt-1 text-sm text-slate-500">Review your answers alongside AI model answers</p>
-            </div>
-            <button onClick={() => navigate(-1)} className={`px-5 py-3 rounded-2xl bg-gradient-to-r ${theme.gradient} text-white text-sm font-bold shadow-md hover:shadow-lg transition-all`}>← Back to Interviews</button>
+      <div className="arena-shell">
+        {/* Top bar */}
+        <div className="arena-topbar">
+          <div className="arena-breadcrumb">
+            <span>ARENA</span><span className="arena-bc-sep">›</span>
+            <span className="arena-bc-track">{meta.track}</span><span className="arena-bc-sep">•</span>
+            <span className="arena-bc-mode">REVIEW</span>
           </div>
+          <button className="arena-end-btn" onClick={() => navigate(-1)}>
+            BACK TO INTERVIEWS <span style={{ fontSize: 16 }}>×</span>
+          </button>
+        </div>
 
-          <div className="grid gap-4">
+        <div style={{ flex: 1, overflowY: "auto", padding: "28px 36px" }}>
+          <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 36, fontWeight: 900, textTransform: "uppercase", margin: "0 0 24px", color: "#fff" }}>
+            Session Review
+          </h2>
+          <div style={{ display: "grid", gap: 12 }}>
             {questions.map((q, i) => {
               const open = expandedReview === i;
               return (
-                <div key={q.id} className={`rounded-2xl border transition-all ${open ? `${theme.lightBorder} ${theme.lightBg}` : "border-slate-200 bg-white hover:border-slate-300"}`}>
-                  <button onClick={() => setExpandedReview(open ? null : i)} className="w-full flex items-center justify-between gap-3 p-5 text-left">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black ${open ? `bg-gradient-to-br ${theme.gradient} text-white` : "bg-slate-100 text-slate-600"}`}>{i+1}</span>
-                      <p className="text-sm font-medium text-slate-800 truncate">{q.question}</p>
+                <div key={q.id} style={{ border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, background: open ? "rgba(255,85,0,0.06)" : "rgba(255,255,255,0.02)", transition: "all 0.2s" }}>
+                  <button onClick={() => setExpandedReview(open ? null : i)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "16px 20px", background: "none", border: "none", color: "#fff", cursor: "pointer", textAlign: "left" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+                      <span style={{ flexShrink: 0, width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, background: open ? "#FF5500" : "rgba(255,255,255,0.08)", color: "#fff" }}>{i + 1}</span>
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{q.question}</p>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      {userAnswers[i]?.trim() ? <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">Answered</Badge> : <Badge className="bg-amber-100 text-amber-700 border-amber-200">Skipped</Badge>}
-                      <svg className={`w-4 h-4 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 10px", borderRadius: 999, background: userAnswers[i]?.trim() ? "rgba(34,197,94,0.15)" : "rgba(255,170,0,0.15)", color: userAnswers[i]?.trim() ? "#4ade80" : "#fbbf24" }}>
+                        {userAnswers[i]?.trim() ? "Answered" : "Skipped"}
+                      </span>
+                      <svg style={{ width: 16, height: 16, color: "rgba(255,255,255,0.3)", transform: open ? "rotate(180deg)" : "", transition: "transform 0.2s" }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                     </div>
                   </button>
                   {open && (
-                    <div className="px-5 pb-5 space-y-4">
-                      <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Your Answer</p>
-                        <p className="text-sm leading-7 text-slate-700">{userAnswers[i]?.trim() || <span className="italic text-slate-400">No answer recorded</span>}</p>
+                    <div style={{ padding: "0 20px 20px", display: "grid", gap: 12 }}>
+                      <div style={{ borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", padding: 16 }}>
+                        <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.16em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", margin: "0 0 8px" }}>Your Answer</p>
+                        <p style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,0.7)", margin: 0 }}>{userAnswers[i]?.trim() || <em style={{ color: "rgba(255,255,255,0.25)" }}>No answer recorded</em>}</p>
                       </div>
-                      <div className={`rounded-2xl border ${theme.lightBorder} p-4 ${theme.lightBg}`}>
-                        <p className={`text-[10px] font-bold uppercase tracking-wider ${theme.lightText} mb-2`}>✨ AI Model Answer</p>
-                        <p className="text-sm leading-7 text-slate-700">{q.bestAnswer}</p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          <Badge className={theme.badge}>{q.framework}</Badge>
-                          <Badge className="bg-slate-100 text-slate-500 border-slate-200">{q.difficulty}</Badge>
+                      <div style={{ borderRadius: 8, border: "1px solid rgba(255,85,0,0.2)", background: "rgba(255,85,0,0.04)", padding: 16 }}>
+                        <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.16em", color: "#FF5500", textTransform: "uppercase", margin: "0 0 8px" }}>✦ AI Model Answer</p>
+                        <p style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,0.7)", margin: 0 }}>{q.bestAnswer}</p>
+                        <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
+                          <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999, background: "rgba(255,85,0,0.12)", color: "#FF5500" }}>{q.framework}</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 999, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}>{q.difficulty}</span>
                         </div>
                       </div>
                     </div>
@@ -185,227 +427,391 @@ export default function InterviewSession({ mode = "mock" }) {
             })}
           </div>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
-  /* ─── PREP / CONFIRMATION PHASE ─── */
+  /* ─── PREP PHASE ─── */
   if (phase === "prep") {
     const guidelines = [
-      { icon: "🎤", title: "Voice-Based Answers", desc: "The AI will ask questions aloud. Click Record and speak your answer naturally." },
-      { icon: "⏱️", title: `${iv.questions || 12} Questions · ${iv.duration}`, desc: "Take your time with each question. You can navigate back and forth." },
-      { icon: "🧠", title: "AI Model Answers", desc: "After finishing, review AI-recommended answers compared to yours." },
-      { icon: "📄", title: "Resume Upload", desc: "Optionally upload your resume to help tailor the session." },
-    ];
-
-    const tips = [
-      "Use the STAR method (Situation, Task, Action, Result) for behavioral questions.",
-      "Speak clearly and at a natural pace for best voice transcription.",
-      "It's okay to pause and collect your thoughts before answering.",
-      "Focus on specific examples rather than generic responses.",
+      { icon: "🎤", title: "Voice-Based Answers", desc: "The AI asks questions aloud. Click Voice and speak naturally." },
+      { icon: "⏱️", title: `${iv.questions || 12} Questions · ${iv.duration}`, desc: "Take your time. Navigate freely between questions." },
+      { icon: "🧠", title: "AI Model Answers", desc: "After finishing, compare your answers with AI recommendations." },
+      { icon: "📊", title: "Live Metrics", desc: "Track clarity, pace, and signal strength in real-time." },
     ];
 
     return (
-      <DashboardLayout projectName="AIX" projectSubtitle="Interview AI" navItems={navItems} activeNav="Interviews" setActiveNav={() => {}} aiShortcuts={aiShortcuts}>
-        <div className="transition-all duration-500" style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)" }}>
-          <div className="max-w-3xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br ${theme.gradient} text-4xl shadow-xl mb-5`}>
-                {theme.icon}
-              </div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{iv.title}</h1>
-              <p className="mt-2 text-slate-500 text-base max-w-md mx-auto">{iv.description}</p>
-              <div className="flex items-center justify-center gap-3 mt-4">
-                <Badge className={theme.badge}>{iv.difficulty}</Badge>
-                <Badge className="bg-slate-100 text-slate-600 border-slate-200">{iv.duration}</Badge>
-                <Badge className="bg-slate-100 text-slate-600 border-slate-200">{iv.questions || 12} Questions</Badge>
-              </div>
-            </div>
-
-            {/* Session Guidelines */}
-            <Panel className="mb-6">
-              <p className={`text-[11px] font-bold uppercase tracking-[0.22em] ${theme.lightText} mb-4`}>What to Expect</p>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {guidelines.map((g) => (
-                  <div key={g.title} className={`flex gap-4 p-4 rounded-2xl border ${theme.lightBorder} ${theme.lightBg} transition-all hover:scale-[1.01]`}>
-                    <span className="text-2xl flex-shrink-0">{g.icon}</span>
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">{g.title}</p>
-                      <p className="text-xs text-slate-500 mt-1 leading-5">{g.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Panel>
-
-            {/* Tips */}
-            <Panel className="mb-8">
-              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-amber-600 mb-4">💡 Pro Tips</p>
-              <div className="space-y-3">
-                {tips.map((tip, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-[11px] font-black mt-0.5">{i + 1}</span>
-                    <p className="text-sm text-slate-700 leading-6">{tip}</p>
-                  </div>
-                ))}
-              </div>
-            </Panel>
-
-            {/* Action Buttons */}
-            <div className="flex items-center justify-center gap-4">
-              <button onClick={() => navigate(-1)} className="px-6 py-3.5 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">
-                ← Go Back
-              </button>
-              <button onClick={() => setPhase("interview")} className={`px-8 py-3.5 rounded-2xl bg-gradient-to-r ${theme.gradient} text-white text-sm font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center gap-2`}>
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                Begin Interview
-              </button>
-            </div>
+      <div className="arena-shell">
+        <div className="arena-topbar">
+          <div className="arena-breadcrumb">
+            <span>ARENA</span><span className="arena-bc-sep">›</span>
+            <span className="arena-bc-track">{meta.track}</span><span className="arena-bc-sep">•</span>
+            <span className="arena-bc-mode">WARM-UP</span>
           </div>
+          <button className="arena-end-btn" onClick={() => navigate(-1)}>
+            GO BACK <span style={{ fontSize: 16 }}>×</span>
+          </button>
         </div>
-      </DashboardLayout>
-    );
-  }
 
-  /* ─── INTERVIEW PHASE ─── */
-  return (
-    <DashboardLayout projectName="AIX" projectSubtitle="Interview AI" navItems={navItems} activeNav="Interviews" setActiveNav={() => {}} aiShortcuts={aiShortcuts}>
-      <div className="transition-all duration-500 ease-out" style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)" }}>
-        {/* Header */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <button onClick={() => { stopSpeaking(); stopRecording(); navigate(-1); }} className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>Back
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 28px" }}>
+          <div style={{ maxWidth: 640, width: "100%", textAlign: "center" }}>
+            <div style={{ fontSize: 52, marginBottom: 16 }}>{meta.icon}</div>
+            <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.02em", color: "#fff", margin: "0 0 10px" }}>
+              {iv.title}
+            </h1>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: "0 0 32px", lineHeight: 1.6 }}>{iv.description}</p>
+
+            <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 36, flexWrap: "wrap" }}>
+              {[iv.difficulty, iv.duration, `${iv.questions || 12} Questions`].map(t => (
+                <span key={t} style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", padding: "6px 16px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)" }}>{t}</span>
+              ))}
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12, textAlign: "left", marginBottom: 40 }}>
+              {guidelines.map(g => (
+                <div key={g.title} style={{ padding: 18, borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                    <span style={{ fontSize: 20 }}>{g.icon}</span>
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#fff" }}>{g.title}</p>
+                  </div>
+                  <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.5 }}>{g.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="resume-upload-shell" style={{ marginBottom: 24 }}>
+              <button type="button" className="resume-upload-close-btn" aria-label="Clear selected resume" onClick={() => setResumeFileName("")}>
+                ×
+              </button>
+              <div className="resume-upload-icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16V8" />
+                  <path d="M8.5 11.5 12 8l3.5 3.5" />
+                </svg>
+              </div>
+              <div className="resume-upload-copy">
+                <h2>Upload a Resume</h2>
+                <p>Select a file to upload before interview start.</p>
+              </div>
+              <label className="resume-upload-input-wrap">
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    setResumeFileName(file?.name || "");
+                  }}
+                />
+                <span>{resumeFileName || "Choose File"}</span>
+              </label>
+            </div>
+
+            <button onClick={() => { setPhase("interview"); timer.reset(); }} className="arena-btn arena-btn--submit" style={{ padding: "16px 40px", fontSize: 14, borderRadius: 8 }}>
+              <svg style={{ width: 18, height: 18 }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /></svg>
+              BEGIN INTERVIEW
             </button>
-            <div>
-              <div className="flex items-center gap-3"><span className="text-2xl">{theme.icon}</span><h1 className="text-2xl font-bold text-slate-900 tracking-tight">{iv.title}</h1></div>
-              <p className="mt-1 text-sm text-slate-500">{iv.description}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge className={theme.badge}>{iv.difficulty}</Badge>
-            <Badge className="bg-slate-100 text-slate-600 border-slate-200">{iv.duration}</Badge>
-            <Badge className="bg-slate-100 text-slate-600 border-slate-200">{questions.length} Qs</Badge>
-          </div>
-        </div>
-
-        {/* Progress */}
-        <div className="mb-8 h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-          <div className={`h-full rounded-full bg-gradient-to-r ${theme.gradient} transition-all duration-500`} style={{ width: `${progress}%` }} />
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          {/* Left — Question + Voice */}
-          <div className="space-y-6">
-            <Panel>
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className={`text-[11px] font-bold uppercase tracking-[0.22em] ${theme.lightText}`}>AI Interviewer</p>
-                  <h2 className="mt-2 text-xl font-semibold text-slate-950">{currentQ ? `Question ${currentIdx+1} of ${questions.length}` : "Preparing..."}</h2>
-                </div>
-                <Badge className={theme.badge}>{Math.round(progress)}%</Badge>
-              </div>
-
-              {currentQ && (
-                <div className="space-y-5">
-                  {/* Question */}
-                  <div className={`rounded-2xl border ${theme.lightBorder} ${theme.lightBg} p-5`}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br ${theme.gradient} text-xs font-black text-white`}>AI</div>
-                      <div className="flex-1"><p className="text-sm font-semibold text-slate-900">Interviewer</p><p className="text-xs text-slate-500">{currentQ.framework}</p></div>
-                      <button onClick={() => isSpeaking ? (stopSpeaking(), setIsSpeaking(false)) : speakQuestion()} className={`p-2 rounded-xl transition-all ${isSpeaking ? "bg-red-100 text-red-600 animate-pulse" : `${theme.lightBg} ${theme.lightText} hover:scale-105`}`} title={isSpeaking ? "Stop" : "Listen"}>
-                        {isSpeaking ? <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10h6v4H9z" /></svg>
-                         : <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15z" /></svg>}
-                      </button>
-                    </div>
-                    <p className="text-base leading-7 text-slate-800 font-medium">{currentQ.question}</p>
-                  </div>
-
-                  {/* Voice Answer */}
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">Your Answer (Voice)</p>
-                      <button
-                        onClick={() => isRecording ? stopRecording() : startRecording()}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${isRecording ? "bg-red-500 text-white shadow-lg shadow-red-500/30 animate-pulse" : `bg-gradient-to-r ${theme.gradient} text-white shadow-md hover:shadow-lg hover:scale-[1.02]`}`}
-                      >
-                        {isRecording ? (
-                          <><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>Stop</>
-                        ) : (
-                          <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-14 0m14 0a7 7 0 00-14 0m14 0v1a7 7 0 01-14 0v-1m7 8v4m-4 0h8" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z" /></svg>Record</>
-                        )}
-                      </button>
-                    </div>
-                    <div className="min-h-[80px] rounded-xl bg-white border border-slate-200 p-4 text-sm text-slate-700 leading-7">
-                      {(isRecording ? currentTranscript : userAnswers[currentIdx]) || <span className="text-slate-400 italic">Click "Record" and speak your answer...</span>}
-                    </div>
-                    {isRecording && <div className="mt-2 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" /><span className="text-xs text-red-500 font-semibold">Listening...</span></div>}
-                  </div>
-
-                  {/* Nav */}
-                  <div className="flex items-center justify-between gap-3 pt-2">
-                    <button onClick={goPrev} disabled={currentIdx === 0} className="px-5 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-semibold text-slate-600 transition disabled:opacity-40 disabled:cursor-not-allowed">← Previous</button>
-                    <span className="text-xs font-semibold text-slate-400">{currentIdx+1} / {questions.length}</span>
-                    {currentIdx < questions.length - 1 ? (
-                      <button onClick={goNext} className={`px-5 py-3 rounded-2xl bg-gradient-to-r ${theme.gradient} text-white text-sm font-bold shadow-md hover:shadow-lg transition-all`}>Next →</button>
-                    ) : (
-                      <button onClick={finishInterview} className="px-5 py-3 rounded-2xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition-all">✓ Finish & Review</button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </Panel>
-          </div>
-
-          {/* Right — Resume + History */}
-          <div className="space-y-6">
-            {/* Resume Upload */}
-            <Panel>
-              <p className={`text-[11px] font-bold uppercase tracking-[0.22em] ${theme.lightText}`}>Resume</p>
-              <h3 className="mt-2 text-lg font-semibold text-slate-950">Upload Your Resume</h3>
-              <p className="mt-1 text-xs text-slate-500">PDF or DOC/DOCX</p>
-              {!resume ? (
-                <div onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }} onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)}
-                  className={`mt-4 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 transition-all cursor-pointer ${dragOver ? `${theme.lightBorder} ${theme.lightBg}` : "border-slate-200 bg-slate-50 hover:border-slate-300"}`}
-                  onClick={() => document.getElementById(`resume-${mode}`).click()}>
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${theme.gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                    <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                  </div>
-                  <p className="text-sm font-semibold text-slate-700">Drag & drop or click to browse</p>
-                  <input id={`resume-${mode}`} type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={e => handleFile(e.target.files[0])} />
-                </div>
-              ) : (
-                <div className={`mt-4 flex items-center gap-4 rounded-2xl border ${theme.lightBorder} ${theme.lightBg} p-4`}>
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${theme.gradient} flex items-center justify-center flex-shrink-0`}>
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                  </div>
-                  <div className="flex-1 min-w-0"><p className="text-sm font-semibold text-slate-900 truncate">{resume.name}</p><p className="text-xs text-slate-500">{formatFileSize(resume.size)}</p></div>
-                  <button onClick={() => setResume(null)} className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all">✕</button>
-                </div>
-              )}
-            </Panel>
-
-            {/* Past Session History */}
-            <Panel>
-              <div className="flex items-center justify-between mb-1">
-                <div><p className={`text-[11px] font-bold uppercase tracking-[0.22em] ${theme.lightText}`}>Past Sessions</p><h3 className="mt-2 text-lg font-semibold text-slate-950">History</h3></div>
-                {history.length > 0 && <button onClick={() => { setHistory([]); localStorage.removeItem(HISTORY_KEY+mode); }} className="text-xs font-semibold text-slate-400 hover:text-red-500 transition">Clear</button>}
-              </div>
-              <p className="text-xs text-slate-500 mb-4">{history.length} question{history.length !== 1 ? "s" : ""} saved</p>
-              {history.length === 0 && <div className="py-8 text-center"><p className="text-sm text-slate-400">Complete an interview to see history</p></div>}
-              <div className="space-y-2 max-h-[350px] overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
-                {history.slice(-15).reverse().map((h, idx) => (
-                  <div key={`${h.id}-${idx}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                    <p className="text-xs font-medium text-slate-800 truncate">{h.question}</p>
-                    {h.userAnswer && <p className="text-[11px] text-emerald-600 mt-1 truncate">You: {h.userAnswer}</p>}
-                  </div>
-                ))}
-              </div>
-            </Panel>
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    );
+  }
+
+  /* ═══════════════════════════════════════════════
+     INTERVIEW PHASE — Arena Layout (matches image)
+     ═══════════════════════════════════════════════ */
+  return (
+    <div className="arena-shell">
+      {/* ── Top Bar ── */}
+      <div className="arena-topbar">
+        <div className="arena-breadcrumb">
+          <span>ARENA</span>
+          <span className="arena-bc-sep">›</span>
+          <span className="arena-bc-track">{meta.track}</span>
+          <span className="arena-bc-sep">•</span>
+          <span className="arena-bc-mode">WARM-UP</span>
+        </div>
+        <button className="arena-end-btn" onClick={() => { stopSpeaking(); stopRecording(); navigate(-1); }}>
+          END SESSION <span style={{ fontSize: 16 }}>×</span>
+        </button>
+      </div>
+
+      {/* ── Progress Row ── */}
+      <div className="arena-qrow">
+        <span className="arena-qnum">/{String(currentIdx + 1).padStart(2, "0")}</span>
+        <div className="arena-track-bar">
+          <div className="arena-track-fill" style={{ width: `${progress}%` }} />
+        </div>
+        <span className="arena-qtotal">{questions.length} TOTAL</span>
+      </div>
+
+      {/* ── Main Two-Column ── */}
+      <div className="arena-main">
+        {/* LEFT — Spline Orb */}
+        <div className="arena-left">
+          <div className={`arena-spline-frame ${isSplineExpanded ? "arena-spline-frame--expanded" : ""}`}>
+            <div className="arena-status-badge">
+              <span className={`arena-status-dot ${isSpeaking || isRecording ? "arena-status-dot--on" : ""}`} />
+              {isRecording ? "RECORDING" : isSpeaking ? "SPEAKING" : "LISTENING"}
+            </div>
+            <div className="arena-status-badge" style={{ top: 56, maxWidth: "min(70vw, 420px)" }} title={voiceLockLabel}>
+              VOICE LOCK: {voiceLockLabel}
+            </div>
+            <button
+              type="button"
+              className="arena-expand-btn"
+              onClick={() => setIsSplineExpanded((prev) => !prev)}
+              aria-label={isSplineExpanded ? "Collapse robo view" : "Expand robo view"}
+            >
+              {isSplineExpanded ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="m9 9-6-6" />
+                  <path d="M3 8V3h5" />
+                  <path d="m15 9 6-6" />
+                  <path d="M16 3h5v5" />
+                  <path d="m9 15-6 6" />
+                  <path d="M3 16v5h5" />
+                  <path d="m15 15 6 6" />
+                  <path d="M21 16v5h-5" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="m8 3-5 5" />
+                  <path d="M3 3h5v5" />
+                  <path d="m16 3 5 5" />
+                  <path d="M16 3h5v5" />
+                  <path d="m8 21-5-5" />
+                  <path d="M3 16v5h5" />
+                  <path d="m16 21 5-5" />
+                  <path d="M16 21h5v-5" />
+                </svg>
+              )}
+            </button>
+            {isSplineExpanded ? (
+              <div className="arena-overlay-top-actions">
+                <div className="arena-top-right-actions">
+                  {currentIdx < questions.length - 1 ? (
+                    <button type="button" className="arena-overlay-action-btn" onClick={goNext}>
+                      Skip
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="arena-overlay-action-btn arena-overlay-action-btn--primary"
+                    onClick={currentIdx < questions.length - 1 ? goNext : finishInterview}
+                  >
+                    {currentIdx < questions.length - 1 ? "Submit" : "Finish"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            <SplineOrb />
+            {isSplineExpanded ? (
+              <div className="arena-user-preview" aria-label="User camera preview">
+                <p className="arena-user-preview-label">You</p>
+                <div className="arena-user-preview-box">
+                  <div className="arena-user-preview-controls">
+                    <button
+                      type="button"
+                      className={`arena-user-control-btn ${micEnabled ? "is-on" : ""}`}
+                      aria-label={micEnabled ? "Turn microphone off" : "Turn microphone on"}
+                      onClick={() => {
+                        if (isRecording) stopRecording();
+                        setMicEnabled((prev) => !prev);
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z" />
+                        <path d="M19 11a7 7 0 0 1-14 0" />
+                        <path d="M12 18v3" />
+                        <path d="M8 21h8" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      className={`arena-user-control-btn ${cameraEnabled ? "is-on" : ""}`}
+                      aria-label={cameraEnabled ? "Turn camera off" : "Turn camera on"}
+                      onClick={() => setCameraEnabled((prev) => !prev)}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="7" width="13" height="10" rx="2" />
+                        <path d="m16 10 5-3v10l-5-3z" />
+                      </svg>
+                    </button>
+                  </div>
+                  {cameraEnabled && cameraReady ? (
+                    <video
+                      ref={userVideoRef}
+                      className="arena-user-video"
+                      autoPlay
+                      muted
+                      playsInline
+                      onLoadedMetadata={(e) => {
+                        e.currentTarget.play?.();
+                        setCameraReady(true);
+                      }}
+                      onError={() => {
+                        setCameraReady(false);
+                        setCameraError("Camera unavailable");
+                      }}
+                    />
+                  ) : userProfileImage ? (
+                    <img src={userProfileImage} alt="Profile" className="arena-user-avatar-img" />
+                  ) : (
+                    <div className="arena-user-avatar-fallback">{userInitial}</div>
+                  )}
+                  {cameraEnabled && !cameraReady ? (
+                    <div className="arena-user-preview-status">{cameraError || "Starting camera..."}</div>
+                  ) : null}
+                  <div className="arena-user-profile-chip">
+                    {userProfileImage ? (
+                      <img src={userProfileImage} alt={`${userDisplayName} profile`} className="arena-user-profile-chip-img" />
+                    ) : (
+                      <span className="arena-user-profile-chip-fallback">{userInitial}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            {isSplineExpanded ? (
+              <div className="arena-expanded-controls">
+                <div>
+                  <p className="arena-tone-label">QUESTION {currentIdx + 1}</p>
+                  <p className="arena-expanded-question">{currentQ?.question || "Preparing your question..."}</p>
+                  <p className="arena-expanded-subtitle">Speak naturally and keep your answer concise, structured, and impact-focused.</p>
+                  <div
+                    style={{
+                      marginTop: 12,
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      background: "rgba(255,255,255,0.04)",
+                      borderRadius: 10,
+                      padding: "10px 12px",
+                      maxWidth: 560,
+                    }}
+                  >
+                    <p style={{ margin: "0 0 6px", fontSize: 10, letterSpacing: "0.08em", color: "rgba(255,255,255,0.5)", fontWeight: 700 }}>
+                      LIVE VOICE TRANSCRIPT
+                    </p>
+                    <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: "rgba(255,255,255,0.85)" }}>
+                      {currentTranscript?.trim() || userAnswers[currentIdx]?.trim() || "Start speaking to see your transcript here..."}
+                    </p>
+                  </div>
+                </div>
+                <div className="arena-expanded-actions">
+                  <div className="arena-timer-display">
+                    <svg style={{ width: 18, height: 18, opacity: 0.5 }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth={2} /><path strokeLinecap="round" strokeWidth={2} d="M12 6v6l4 2" /></svg>
+                    {timer.fmt}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="arena-spline-footer">
+                <div>
+                  <p className="arena-tone-label">TONE</p>
+                  <p className="arena-tone-val">CALM. COACHING. BUILDS CONFIDENCE.</p>
+                  <div
+                    style={{
+                      marginTop: 8,
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      background: "rgba(255,255,255,0.04)",
+                      borderRadius: 10,
+                      padding: "8px 10px",
+                      maxWidth: 420,
+                    }}
+                  >
+                    <p style={{ margin: "0 0 4px", fontSize: 9, letterSpacing: "0.08em", color: "rgba(255,255,255,0.5)", fontWeight: 700 }}>
+                      LIVE VOICE TRANSCRIPT
+                    </p>
+                    <p style={{ margin: 0, fontSize: 11, lineHeight: 1.5, color: "rgba(255,255,255,0.85)" }}>
+                      {currentTranscript?.trim() || userAnswers[currentIdx]?.trim() || "Speak to capture your response..."}
+                    </p>
+                  </div>
+                </div>
+                <div className="arena-timer-display">
+                  <svg style={{ width: 18, height: 18, opacity: 0.5 }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth={2} /><path strokeLinecap="round" strokeWidth={2} d="M12 6v6l4 2" /></svg>
+                  {timer.fmt}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT — Question + Response */}
+        <div className="arena-right">
+          <p className="arena-qlabel">QUESTION {currentIdx + 1} / {questions.length}</p>
+          <h2 className="arena-qtext">{currentQ?.question || "Preparing your question..."}</h2>
+
+          <p className="arena-resp-label">YOUR RESPONSE</p>
+          <textarea
+            className="arena-textarea"
+            placeholder="Think out loud. Structure: situation → action → impact."
+            value={isRecording ? currentTranscript : (userAnswers[currentIdx] || "")}
+            onChange={e => {
+              const val = e.target.value;
+              setUserAnswers(prev => { const n = [...prev]; n[currentIdx] = val; return n; });
+            }}
+            readOnly={isRecording}
+          />
+
+          <div className="arena-meta-row">
+            <span>{metrics.words} WORDS</span>
+            <span>AUTO-ADVANCE AT 0:00</span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="arena-action-row">
+            {currentIdx > 0 && (
+              <button className="arena-btn arena-btn--skip" onClick={goPrev}>
+                <svg className="arena-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+                PREV
+              </button>
+            )}
+            <button
+              className={`arena-btn ${isRecording ? "arena-btn--recording" : "arena-btn--voice"}`}
+              onClick={() => isRecording ? stopRecording() : startRecording()}
+            >
+              {isRecording ? (
+                <><svg className="arena-btn-icon" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>STOP</>
+              ) : (
+                <><svg className="arena-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-14 0m14 0a7 7 0 00-14 0m14 0v1a7 7 0 01-14 0v-1m7 8v4m-4 0h8" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 1a3 3 0 00-3 3v7a3 3 0 006 0V4a3 3 0 00-3-3z" /></svg>VOICE</>
+              )}
+            </button>
+
+            {currentIdx < questions.length - 1 ? (
+              <button className="arena-btn arena-btn--skip" onClick={goNext}>
+                <svg className="arena-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polygon points="5 4 15 12 5 20" fill="currentColor" /><line x1="19" y1="5" x2="19" y2="19" strokeWidth={2.5} /></svg>
+                SKIP
+              </button>
+            ) : null}
+
+            {currentIdx < questions.length - 1 ? (
+              <button className="arena-btn arena-btn--submit" onClick={goNext}>
+                SUBMIT <svg className="arena-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14M12 5l7 7-7 7" /></svg>
+              </button>
+            ) : (
+              <button className="arena-btn arena-btn--submit" onClick={finishInterview}>
+                FINISH <svg className="arena-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Bottom Metrics Strip ── */}
+      <div className="arena-metrics">
+        <div className="arena-metric-card">
+          <p className="arena-metric-label">CLARITY</p>
+          <p className="arena-metric-val">✦ {metrics.clarity}</p>
+        </div>
+        <div className="arena-metric-card">
+          <p className="arena-metric-label">PACE</p>
+          <p className="arena-metric-val">✦ {metrics.pace}</p>
+        </div>
+        <div className="arena-metric-card">
+          <p className="arena-metric-label">SIGNAL</p>
+          <p className="arena-metric-val">✦ {metrics.signal}</p>
+        </div>
+      </div>
+    </div>
   );
 }

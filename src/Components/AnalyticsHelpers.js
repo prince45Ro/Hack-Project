@@ -98,7 +98,7 @@ export function RadialGauge({ value, size = 72, stroke = 7, color = "#6366f1" })
 export function StatCard({ icon: Icon, label, value, sub, trend, sparkPoints, color, colorBg, hoverDetails }) {
   const isPos = trend >= 0;
   const card = (
-    <div className="rounded-3xl bg-white border border-slate-100 p-5 shadow-sm flex flex-col gap-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-default">
+    <div className="liquid-glass-card rounded-3xl p-5 flex flex-col gap-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-default">
       <div className="flex items-center justify-between">
         <div className="flex h-10 w-10 items-center justify-center rounded-2xl flex-shrink-0" style={{ background: colorBg }}>
           <Icon className="h-5 w-5" style={{ color }} />
@@ -111,8 +111,8 @@ export function StatCard({ icon: Icon, label, value, sub, trend, sparkPoints, co
         )}
       </div>
       <div>
-        <p className="text-[26px] font-bold tracking-tight text-slate-900 leading-none">{value}</p>
-        <p className="mt-1 text-sm font-semibold text-slate-500">{label}</p>
+        <p className="text-[26px] font-bold tracking-tight text-white leading-none">{value}</p>
+        <p className="mt-1 text-sm font-semibold text-slate-300">{label}</p>
         {sub && <p className="mt-0.5 text-[11px] text-slate-400">{sub}</p>}
       </div>
       {sparkPoints && sparkPoints.length >= 2 && (
@@ -127,10 +127,10 @@ export function StatCard({ icon: Icon, label, value, sub, trend, sparkPoints, co
 // ─── Section card ─────────────────────────────────────────────────────────
 export function Section({ title, sub, badge, children }) {
   return (
-    <div className="rounded-3xl bg-white border border-slate-100 p-6 shadow-sm">
+    <div className="liquid-glass-card rounded-3xl p-6">
       <div className="flex items-start justify-between mb-5">
         <div>
-          <p className="text-[15px] font-bold text-slate-900">{title}</p>
+          <p className="text-[15px] font-bold text-white">{title}</p>
           {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
         </div>
         {badge && (

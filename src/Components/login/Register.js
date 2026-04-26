@@ -80,11 +80,11 @@ function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-8 font-sans">
-      <div className="mx-auto w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 shadow-lg md:p-10 lg:p-12">
+    <div className="min-h-screen px-4 py-8 font-sans flex items-center">
+      <div className="liquid-glass-card mx-auto w-full max-w-xl rounded-3xl p-8 md:p-10 lg:p-12">
         <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md">
-          <h2 className="text-3xl font-bold text-slate-900">Create your account</h2>
-          <p className="mt-2 text-sm text-slate-500">
+          <h2 className="text-3xl font-bold text-white">Create your account</h2>
+          <p className="mt-2 text-sm text-slate-300">
             Start practicing interviews with personalized AI coaching.
           </p>
 
@@ -96,7 +96,7 @@ function Register() {
                 placeholder="Full Name"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                className="liquid-glass-input w-full rounded-xl px-4 py-3 text-slate-100 outline-none transition focus:border-sky-300"
               />
               {errors.fullName ? <p className="mt-1 text-xs text-red-600">{errors.fullName}</p> : null}
             </div>
@@ -108,7 +108,7 @@ function Register() {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                className="liquid-glass-input w-full rounded-xl px-4 py-3 text-slate-100 outline-none transition focus:border-sky-300"
               />
               {errors.email ? <p className="mt-1 text-xs text-red-600">{errors.email}</p> : null}
             </div>
@@ -120,7 +120,7 @@ function Register() {
                 placeholder="Mobile Number"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                className="liquid-glass-input w-full rounded-xl px-4 py-3 text-slate-100 outline-none transition focus:border-sky-300"
               />
               {errors.phone ? <p className="mt-1 text-xs text-red-600">{errors.phone}</p> : null}
             </div>
@@ -132,7 +132,7 @@ function Register() {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                className="liquid-glass-input w-full rounded-xl px-4 py-3 text-slate-100 outline-none transition focus:border-sky-300"
               />
               {errors.password ? <p className="mt-1 text-xs text-red-600">{errors.password}</p> : null}
             </div>
@@ -144,7 +144,7 @@ function Register() {
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                className="liquid-glass-input w-full rounded-xl px-4 py-3 text-slate-100 outline-none transition focus:border-sky-300"
               />
               {errors.confirmPassword ? (
                 <p className="mt-1 text-xs text-red-600">{errors.confirmPassword}</p>
@@ -153,7 +153,7 @@ function Register() {
           </div>
 
           <div className="mt-5">
-            <label className="inline-flex items-start gap-2 text-sm text-slate-600">
+            <label className="inline-flex items-start gap-2 text-sm text-slate-300">
               <input
                 type="checkbox"
                 name="agreeToTerms"
@@ -168,22 +168,22 @@ function Register() {
 
           <button
             type="submit"
-            className="mt-6 w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800"
+            className="liquid-glass-button mt-6 w-full rounded-xl px-4 py-3 font-semibold text-white transition hover:-translate-y-0.5"
           >
             Create account
           </button>
 
           <div className="my-6 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-slate-300 after:mt-0.5 after:flex-1 after:border-t after:border-slate-300">
-            <p className="mx-4 mb-0 text-center text-sm font-medium text-slate-500">
+            <p className="mx-4 mb-0 text-center text-sm font-medium text-slate-400">
               OR
             </p>
           </div>
 
           <GoogleAuthButton label="Continue with Google" onClick={handleGoogleSignup} />
 
-          <p className="mt-5 text-center text-sm text-slate-600">
+          <p className="mt-5 text-center text-sm text-slate-300">
             Already have an account?{" "}
-            <Link to="/login" className="font-semibold text-slate-700 hover:text-slate-900">
+            <Link to="/login" className="font-semibold text-slate-100 hover:text-white">
               Login
             </Link>
           </p>

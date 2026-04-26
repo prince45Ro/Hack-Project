@@ -59,17 +59,17 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-8 font-sans">
-      <div className="mx-auto w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 shadow-lg md:p-10 lg:p-12">
+    <div className="min-h-screen px-4 py-8 font-sans flex items-center">
+      <div className="liquid-glass-card mx-auto w-full max-w-xl rounded-3xl p-8 md:p-10 lg:p-12">
         <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md">
-          <h2 className="text-3xl font-bold text-slate-900">Welcome back</h2>
-          <p className="mt-2 text-sm text-slate-500">
+          <h2 className="text-3xl font-bold text-white">Welcome back</h2>
+          <p className="mt-2 text-sm text-slate-300">
             Sign in to continue your interview journey.
           </p>
 
           <div className="mt-8 space-y-5">
             <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700">
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-200">
                 Email Address
               </label>
               <input
@@ -79,13 +79,13 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="you@example.com"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                className="liquid-glass-input w-full rounded-xl px-4 py-3 text-slate-100 outline-none transition focus:border-sky-300"
               />
               {errors.email ? <p className="mt-1 text-xs text-red-600">{errors.email}</p> : null}
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-medium text-slate-700">
+              <label htmlFor="password" className="mb-2 block text-sm font-medium text-slate-200">
                 Password
               </label>
               <input
@@ -95,14 +95,14 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-800 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                className="liquid-glass-input w-full rounded-xl px-4 py-3 text-slate-100 outline-none transition focus:border-sky-300"
               />
               {errors.password ? <p className="mt-1 text-xs text-red-600">{errors.password}</p> : null}
             </div>
           </div>
 
           <div className="mt-4 flex items-center justify-between text-sm">
-            <label className="inline-flex items-center gap-2 text-slate-600">
+            <label className="inline-flex items-center gap-2 text-slate-300">
               <input
                 type="checkbox"
                 name="rememberMe"
@@ -112,29 +112,29 @@ const Login = () => {
               />
               Remember me
             </label>
-            <Link to="/verification" className="font-medium text-slate-700 hover:text-slate-900">
+            <Link to="/verification" className="font-medium text-slate-200 hover:text-white">
               Forgot password?
             </Link>
           </div>
 
           <button
             type="submit"
-            className="mt-7 w-full rounded-xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-800"
+            className="liquid-glass-button mt-7 w-full rounded-xl px-4 py-3 font-semibold text-white transition hover:-translate-y-0.5"
           >
             Login
           </button>
 
           <div className="my-6 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-slate-300 after:mt-0.5 after:flex-1 after:border-t after:border-slate-300">
-            <p className="mx-4 mb-0 text-center text-sm font-medium text-slate-500">
+            <p className="mx-4 mb-0 text-center text-sm font-medium text-slate-400">
               OR
             </p>
           </div>
 
           <GoogleAuthButton label="Continue with Google" onClick={handleGoogleLogin} />
 
-          <p className="mt-5 text-center text-sm text-slate-600">
+          <p className="mt-5 text-center text-sm text-slate-300">
             New here?{" "}
-            <Link to="/register" className="font-semibold text-slate-700 hover:text-slate-900">
+            <Link to="/register" className="font-semibold text-slate-100 hover:text-white">
               Create an account
             </Link>
           </p>

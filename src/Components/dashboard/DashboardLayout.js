@@ -26,17 +26,17 @@ export default function DashboardLayout({
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-[#e7ebf3] p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto w-full max-w-480 overflow-hidden rounded-[38px] bg-[#f9fbff] shadow-[0_30px_100px_rgba(15,23,42,0.08)]">
+    <div className="dashboard-shell min-h-screen p-4 sm:p-6 lg:p-8">
+      <div className="liquid-glass-panel mx-auto w-full max-w-480 overflow-hidden rounded-[38px]">
         <div className={`lg:grid ${sidebarCollapsed ? 'lg:grid-cols-[100px_minmax(0,1fr)]' : 'lg:grid-cols-[340px_minmax(0,1fr)] 2xl:grid-cols-[360px_minmax(0,1fr)]'} transition-[grid-template-columns] duration-500 ease-in-out`}>
           {/* Sidebar */}
-          <aside className="flex min-h-full flex-col border-r border-slate-200 bg-white overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none' }}>
-            <div className={`flex items-center ${sidebarCollapsed ? 'justify-center py-8' : 'justify-between px-6 py-8'} border-b border-slate-200 transition-all duration-500 min-h-[108px]`}>
+          <aside className="flex min-h-full flex-col border-r border-white/10 bg-transparent overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none' }}>
+            <div className={`flex items-center ${sidebarCollapsed ? 'justify-center py-8' : 'justify-between px-6 py-8'} border-b border-white/10 transition-all duration-500 min-h-[108px]`}>
               {!sidebarCollapsed ? (
                 <>
                   <div className="flex items-center gap-3 whitespace-nowrap">
                     <div>
-                      <p className="text-[30px] font-bold tracking-tight text-slate-900 leading-none">
+                      <p className="text-[30px] font-bold tracking-tight text-white leading-none">
                         {projectName}
                       </p>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 mt-1">
@@ -47,7 +47,7 @@ export default function DashboardLayout({
                   <button
                     type="button"
                     onClick={() => setSidebarCollapsed(true)}
-                    className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 rounded-xl transition-all flex-shrink-0"
+                    className="liquid-glass-chip rounded-xl p-2 text-slate-300 transition-all flex-shrink-0"
                     title="Collapse Sidebar"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
@@ -59,7 +59,7 @@ export default function DashboardLayout({
                 <button
                   type="button"
                   onClick={() => setSidebarCollapsed(false)}
-                  className="p-3 text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+                  className="liquid-glass-chip rounded-xl p-3 text-slate-200 transition-all"
                   title="Expand Sidebar"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-7 h-7">
@@ -83,8 +83,8 @@ export default function DashboardLayout({
                       title={sidebarCollapsed ? item.label : undefined}
                       className={`flex w-full items-center ${sidebarCollapsed ? 'justify-center p-3' : 'gap-4 px-5 py-4'} rounded-2xl text-sm font-semibold transition-all duration-300 ${
                         isActive
-                          ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          ? "liquid-glass-button text-white"
+                          : "text-slate-300 hover:bg-white/8 hover:text-white"
                       }`}
                     >
                       <Icon className="h-6 w-6 flex-shrink-0" />
@@ -96,7 +96,7 @@ export default function DashboardLayout({
             </nav>
 
             {!sidebarCollapsed && (
-              <div className="border-t border-slate-200 px-5 py-6 whitespace-nowrap animate-in fade-in duration-500">
+              <div className="border-t border-white/10 px-5 py-6 whitespace-nowrap animate-in fade-in duration-500">
                 <div className="mb-4 flex items-center justify-between">
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
                     AI Shortcuts
@@ -112,17 +112,17 @@ export default function DashboardLayout({
                         key={item.title}
                         type="button"
                         onClick={() => navigate(item.path)}
-                        className="group block w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-sky-300 hover:bg-sky-50 hover:shadow-md"
+                        className="liquid-glass-card group block w-full rounded-2xl p-4 text-left transition hover:border-sky-300/40 hover:-translate-y-0.5"
                       >
                         <div className="flex items-start gap-4">
-                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-slate-50 transition group-hover:bg-white">
-                            <Icon className="h-5 w-5 text-slate-700 transition group-hover:text-sky-600" />
+                          <div className="liquid-glass-chip flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition">
+                            <Icon className="h-5 w-5 text-slate-100 transition group-hover:text-sky-300" />
                           </div>
                           <div className="overflow-hidden">
-                            <p className="text-sm font-semibold text-slate-900 transition group-hover:text-sky-700 truncate">
+                            <p className="text-sm font-semibold text-white transition group-hover:text-sky-200 truncate">
                               {item.title}
                             </p>
-                            <p className="mt-1 text-xs leading-5 text-slate-500 truncate">
+                            <p className="mt-1 text-xs leading-5 text-slate-400 truncate">
                               {item.detail}
                             </p>
                           </div>
@@ -139,7 +139,7 @@ export default function DashboardLayout({
                 type="button"
                 onClick={() => alert("Leave Feedback Clicked")}
                 title={sidebarCollapsed ? "Leave Feedback" : undefined}
-                className={`flex w-full items-center ${sidebarCollapsed ? 'justify-center p-3' : 'justify-between px-4 py-3'} rounded-2xl border border-slate-200 text-sm font-semibold text-slate-600 transition hover:border-sky-200 hover:text-sky-700 whitespace-nowrap`}
+                className={`liquid-glass-chip flex w-full items-center ${sidebarCollapsed ? 'justify-center p-3' : 'justify-between px-4 py-3'} rounded-2xl text-sm font-semibold text-slate-200 transition hover:text-sky-200 whitespace-nowrap`}
               >
                 <span className={`flex items-center ${sidebarCollapsed ? '' : 'gap-3'}`}>
                   <FeedbackIcon className="h-5 w-5 flex-shrink-0" />
@@ -151,16 +151,16 @@ export default function DashboardLayout({
           </aside>
 
           {/* Main Area */}
-          <main className="min-w-0 bg-[#f9fbff] flex flex-col h-full overflow-hidden">
+          <main className="min-w-0 bg-transparent flex flex-col h-full overflow-hidden">
             {/* Top Navigation */}
-            <div className="border-b border-slate-200 bg-white px-6 py-5 lg:px-10">
+            <div className="border-b border-white/10 bg-transparent px-6 py-5 lg:px-10">
               <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                <label className="flex w-full max-w-105 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <label className="liquid-glass-input flex w-full max-w-105 items-center gap-3 rounded-2xl px-4 py-3">
                   <SearchIcon className="h-5 w-5 text-slate-400" />
                   <input
                     type="text"
                     placeholder="Search..."
-                    className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                    className="w-full bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-400"
                   />
                 </label>
 
@@ -169,15 +169,15 @@ export default function DashboardLayout({
 
                   <button
                     type="button"
-                    className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-500"
+                    className="liquid-glass-chip rounded-2xl p-3 text-slate-300"
                     onClick={() => alert("Notifications Clicked")}
                   >
                     <BellIcon className="h-5 w-5" />
                   </button>
 
-                  <div className="flex items-center gap-3 rounded-2xl bg-white px-2 py-1">
+                  <div className="liquid-glass-chip flex items-center gap-3 rounded-2xl px-2 py-1">
                     <div className="pr-1 pl-2 py-1">
-                      <p className="text-sm font-semibold text-slate-900">User</p>
+                      <p className="text-sm font-semibold text-white">User</p>
                       <p className="text-xs text-slate-400">Admin</p>
                     </div>
                   </div>

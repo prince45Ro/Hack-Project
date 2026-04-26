@@ -2,7 +2,7 @@ import { motion, LazyMotion, domAnimation } from "framer-motion";
 import { Link } from "react-router-dom";
 
 export default function Body() {
-  const cards = [
+  const dreamJobCards = [
     {
       title: "Mock Interviews",
       description: "Simulate real interview experience with AI feedback.",
@@ -10,7 +10,7 @@ export default function Body() {
         "https://t4.ftcdn.net/jpg/08/80/14/63/240_F_880146375_SYk2GHREB68lHG22dcxIZ9zdLwNXdrh9.jpg",
       alt: "Mock interview session",
       primaryButton: "Explore",
-      primaryLink: "/interviews",
+      primaryLink: "/mock",
       color: "from-blue-500/20 to-indigo-500/20",
     },
     {
@@ -29,12 +29,11 @@ export default function Body() {
       image:
         "https://imgs.search.brave.com/6ro9pnEo3O2Q8o6WQUgdaNhO1629gQtJc7BVngPyVbk/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9hc3Nl/dHMuZGVzaWdudGVt/cGxhdGUuaW8vdGh1/LWphbi0xMi0yMDIz/LTItMTAtcG0xMzA3/OC53ZWJw",
       alt: "Technical assessment",
-      primaryButton: "Explore ",
+      primaryButton: "Explore",
       primaryLink: "/technical",
       color: "from-emerald-500/20 to-teal-500/20",
     },
   ];
-
   const whyChooseUs = [
     {
       icon: "🤖",
@@ -74,46 +73,9 @@ export default function Body() {
     },
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 50, scale: 0.95 },
-    show: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { 
-        type: "spring",
-        stiffness: 70,
-        damping: 15,
-        mass: 1
-      },
-    },
-  };
-
   return (
-    <div className="relative overflow-hidden py-16 px-6 md:px-8 bg-linear-to-br from-slate-50 via-gray-50 to-blue-50/50">
+    <div className="relative overflow-hidden px-6 py-16 md:px-8">
       <LazyMotion features={domAnimation}>
-        {/* Animated background gradient layer */}
-        <div className="absolute inset-0 bg-linear-to-br from-slate-200/30 via-blue-100/20 to-gray-200/30 animate-gradient-shift"></div>
-
-        {/* Floating blobs with professional muted tones */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/20 rounded-full blur-3xl animate-float-slow"></div>
-          <div className="absolute top-1/4 -left-20 w-72 h-72 bg-indigo-200/20 rounded-full blur-3xl animate-float-medium"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-sky-200/20 rounded-full blur-3xl animate-float-fast"></div>
-          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-slate-200/30 rounded-full blur-3xl animate-pulse-slow"></div>
-        </div>
-
         <div className="relative z-10 max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
@@ -122,66 +84,66 @@ export default function Body() {
             transition={{ duration: 1, type: "spring", bounce: 0.3 }}
             className="text-center mb-16"
           >
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-slate-800 tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white tracking-tight">
               Prepare for Your{" "}
-              <span className="bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-indigo-600">
+              <span className="bg-clip-text text-transparent bg-linear-to-r from-blue-300 to-cyan-300">
                 Dream Job
               </span>
             </h1>
-            <p className="text-slate-600 max-w-2xl mx-auto text-lg font-light leading-relaxed">
-              Master every stage of your interview journey with our AI‑powered
-              tools and realistic simulations.
+            <p className="text-slate-300 max-w-2xl mx-auto text-lg font-light leading-relaxed">
+              Master every stage of your interview journey with AI-powered tools,
+              realistic simulations, and guided practice across every track.
             </p>
           </motion.div>
 
-          {/* Cards grid (original image cards) */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            {cards.map((card, index) => (
+          <div className="mb-24 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {dreamJobCards.map((card, index) => (
               <motion.div
-                key={index}
-                variants={itemVariants}
+                key={card.title}
+                initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 70,
+                  damping: 15,
+                  mass: 1,
+                  delay: index * 0.08,
+                }}
                 whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="group bg-white/70 backdrop-blur-md rounded-2xl shadow-md overflow-hidden border border-white/80 transition-all duration-500 hover:shadow-xl hover:bg-white/80"
+                className="liquid-glass-card group overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:border-white/20"
               >
-                <div className="relative h-48 overflow-hidden">
+                <div className="relative h-52 overflow-hidden">
                   <img
                     src={card.image}
                     alt={card.alt}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div
-                    className={`absolute inset-0 bg-linear-to-t ${card.color} mix-blend-overlay transition-opacity duration-500 group-hover:opacity-75`}
-                  ></div>
+                    className={`absolute inset-0 bg-linear-to-t ${card.color} mix-blend-screen transition-opacity duration-500 group-hover:opacity-85`}
+                  />
                 </div>
                 <div className="p-6 text-center">
-                  <h2 className="text-2xl font-semibold text-slate-800 mb-2 tracking-tight">
+                  <h2 className="mb-2 text-2xl font-semibold tracking-tight text-white">
                     {card.title}
                   </h2>
-                  <p className="text-slate-600 mb-4 text-sm leading-relaxed font-light">
+                  <p className="mb-4 text-sm font-light leading-relaxed text-slate-300">
                     {card.description}
                   </p>
-                  <div className="space-y-3">
-                    <Link
-                      to={card.primaryLink}
-                      onClick={() => window.scrollTo(0, 0)}
-                      className="group/btn block w-full px-5 py-2.5 rounded-full bg-slate-800 text-white text-sm font-medium border border-slate-700 shadow-sm transition-all duration-300 hover:bg-slate-900 hover:scale-105"
-                    >
-                      {card.primaryButton}
-                      <span className="inline-block ml-2 transition-transform duration-300 group-hover/btn:translate-x-1">
-                        →
-                      </span>
-                    </Link>
-                  </div>
+                  <Link
+                    to={card.primaryLink}
+                    onClick={() => window.scrollTo(0, 0)}
+                    className="liquid-glass-button group/btn inline-flex w-full items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:scale-105"
+                  >
+                    {card.primaryButton}
+                    <span className="ml-2 inline-block transition-transform duration-300 group-hover/btn:translate-x-1">
+                      →
+                    </span>
+                  </Link>
                 </div>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
 
           {/* Why Choose Us Section Header */}
           <motion.div
@@ -189,15 +151,15 @@ export default function Body() {
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 1, type: "spring", bounce: 0.3 }}
-            className="text-center mt-24 mb-12"
+            className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-800 tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
               Why Choose{" "}
-              <span className="bg-clip-text text-transparent bg-linear-to-r from-amber-500 to-yellow-500">
+              <span className="bg-clip-text text-transparent bg-linear-to-r from-amber-300 to-yellow-400">
                 Us ?
               </span>
             </h2>
-            <p className="text-slate-600 mt-4 max-w-2xl mx-auto text-lg font-light">
+            <p className="text-slate-300 mt-4 max-w-2xl mx-auto text-lg font-light">
               Discover what makes our platform the smartest way to prepare,
               practice, and succeed in interviews.
             </p>
@@ -217,7 +179,7 @@ export default function Body() {
                   delay: idx * 0.15 
                 }}
                 whileHover={{ scale: 1.02, y: -5, transition: { type: "spring", stiffness: 300 } }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center px-6 md:px-10 py-10 max-w-7xl mx-auto bg-white/70 backdrop-blur-md border border-white/80 shadow-md rounded-2xl transition-all duration-500"
+                className="liquid-glass-card grid max-w-7xl grid-cols-1 items-center gap-10 rounded-2xl px-6 py-10 transition-all duration-500 md:grid-cols-2 md:px-10"
               >
                 {/* Image (alternate sides) */}
                 <div className={`${idx % 2 !== 0 ? "md:order-2" : ""}`}>
@@ -234,11 +196,11 @@ export default function Body() {
                     Why Choose Us
                   </p>
 
-                  <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-3">
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
                     {item.title}
                   </h2>
 
-                  <p className="text-slate-600 mb-4">{item.description}</p>
+                  <p className="text-slate-300 mb-4">{item.description}</p>
 
                   <ul className="space-y-2 mb-5">
                     {item.title === "AI-Powered Feedback" && (
@@ -348,14 +310,14 @@ export default function Body() {
             className="mt-24 mb-24 scroll-mt-28"
           >
             <div className="max-w-6xl mx-auto text-center">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-800 mb-4 tracking-tight text-center">
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight text-center">
                 Crack Interviews{" "}
-                <span className="bg-clip-text text-transparent bg-linear-to-r from-amber-500 to-yellow-500">
+                <span className="bg-clip-text text-transparent bg-linear-to-r from-amber-300 to-yellow-400">
                   with ease
                 </span>
               </h2>
 
-              <p className="text-slate-600 text-lg leading-relaxed mb-6 text-center max-w-2xl mx-auto">
+              <p className="text-slate-300 text-lg leading-relaxed mb-6 text-center max-w-2xl mx-auto">
                 Experience real-time AI-powered interviews that feel just like
                 the real thing. Practice speaking, improve confidence, and get
                 instant feedback — all in one place.
@@ -441,10 +403,10 @@ export default function Body() {
                       <p className="text-sm text-indigo-600 font-semibold mb-2">
                         Feature
                       </p>
-                      <h3 className="text-3xl font-bold text-slate-800 mb-4">
+                      <h3 className="text-3xl font-bold text-white mb-4">
                         {item.title}
                       </h3>
-                      <p className="text-slate-600 leading-relaxed text-base">
+                      <p className="text-slate-300 leading-relaxed text-base">
                         {item.desc}
                       </p>
                       <div className="mt-4 h-px w-16 bg-indigo-300/40"></div>
@@ -464,13 +426,13 @@ export default function Body() {
             className="mt-24 mb-16"
           >
             <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-800 tracking-tight">
+              <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
                 Companies{" "}
-                <span className="bg-clip-text text-transparent bg-linear-to-r from-amber-500 to-yellow-500">
+                <span className="bg-clip-text text-transparent bg-linear-to-r from-amber-300 to-yellow-400">
                   Associated with Us
                 </span>
               </h2>
-              <p className="text-slate-600 mt-4 max-w-2xl mx-auto text-lg font-light">
+              <p className="text-slate-300 mt-4 max-w-2xl mx-auto text-lg font-light">
                 Practice and get prepared for interviews at top global tech
                 companies.
               </p>
@@ -527,27 +489,6 @@ export default function Body() {
             </div>
           </motion.div>
 
-          {/* CTA banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="mt-16 text-center mb-16"
-          >
-            <Link to="/interviews" onClick={() => window.scrollTo(0,0)} className="inline-block bg-slate-900 text-white rounded-full px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-slate-800 cursor-pointer group">
-              <p className="text-sm font-medium flex items-center justify-center gap-2">
-                🚀{" "}
-                <span className="font-bold">
-                  Try free mock interview
-                </span>
-                <span className="opacity-70 font-light hidden sm:inline">
-                  — Explore Interviews
-                </span>
-                <span className="inline-block ml-1 transition-transform duration-300 group-hover:translate-x-1">→</span>
-              </p>
-            </Link>
-          </motion.div>
         </div>
       </LazyMotion>
       <style>{`
