@@ -17,7 +17,17 @@ import Verification from "./Components/login/Verification.js";
 import LeaderboardPage from "./Components/LeaderboardPage";
 import InterviewSession from "./Components/InterviewSession";
 import { BRAND_LOGO_URL } from "./brandAssets";
-
+import {
+  DashboardSkeleton,
+  LeaderboardSkeleton,
+  AnalyticsSkeleton,
+  InterviewsHubSkeleton,
+  PlaceholderSkeleton,
+  HomeSkeleton,
+  LoginSkeleton,
+  RegisterSkeleton,
+  VerificationSkeleton,
+} from "./Components/skeletons";
 
 import { useLocation } from "react-router-dom";
 
@@ -141,9 +151,44 @@ function AppBackground() {
   );
 }
 
+function getSkeletonForRoute(pathname) {
+  // Full-screen pages (no sidebar/topbar shell)
+  if (pathname === "/" || pathname === "/home")
+    return { component: <HomeSkeleton />, fullscreen: true };
+  if (pathname === "/login")
+    return { component: <LoginSkeleton />, fullscreen: true };
+  if (pathname === "/register")
+    return { component: <RegisterSkeleton />, fullscreen: true };
+  if (pathname === "/verification")
+    return { component: <VerificationSkeleton />, fullscreen: true };
+  if (pathname === "/pricing")
+    return { component: <HomeSkeleton />, fullscreen: true };
+
+  // Dashboard-layout pages (sidebar + topbar shell)
+  if (pathname === "/dashboard")
+    return { component: <DashboardSkeleton />, fullscreen: false };
+  if (pathname === "/leaderboard")
+    return { component: <LeaderboardSkeleton />, fullscreen: false };
+  if (pathname === "/analytics")
+    return { component: <AnalyticsSkeleton />, fullscreen: false };
+  if (pathname === "/interviews")
+    return { component: <InterviewsHubSkeleton />, fullscreen: false };
+  if (pathname === "/mock" || pathname === "/technical" || pathname === "/hr-interview")
+    return { component: <InterviewsHubSkeleton />, fullscreen: false };
+  if (
+    pathname === "/candidates" ||
+    pathname === "/settings" ||
+    pathname.startsWith("/feature/")
+  )
+    return { component: <PlaceholderSkeleton />, fullscreen: false };
+
+  return null;
+}
+
 function RouteSkeletonOverlay() {
   const { pathname } = useLocation();
   const [visible, setVisible] = React.useState(false);
+  const [frozenPath, setFrozenPath] = React.useState(pathname);
   const isFirstRender = React.useRef(true);
 
   React.useEffect(() => {
@@ -152,35 +197,70 @@ function RouteSkeletonOverlay() {
       return;
     }
 
+    setFrozenPath(pathname);
     setVisible(true);
-    const timeoutId = window.setTimeout(() => setVisible(false), 420);
+    const timeoutId = window.setTimeout(() => setVisible(false), 480);
 
     return () => window.clearTimeout(timeoutId);
   }, [pathname]);
 
+  const skelData = getSkeletonForRoute(frozenPath);
+
   return (
     <div className={`route-skeleton-overlay ${visible ? "is-visible" : ""}`} aria-hidden={!visible}>
-      <div className="route-skeleton-shell">
-        <div className="route-skeleton-sidebar">
-          <div className="route-skeleton-line route-skeleton-logo"></div>
-          <div className="route-skeleton-line route-skeleton-menu"></div>
-          <div className="route-skeleton-line route-skeleton-menu"></div>
-          <div className="route-skeleton-line route-skeleton-menu"></div>
-          <div className="route-skeleton-line route-skeleton-menu"></div>
-          <div className="route-skeleton-line route-skeleton-menu"></div>
+      {skelData && skelData.fullscreen ? (
+        /* Full-screen skeleton (auth / home / pricing — no sidebar) */
+        <div className="route-skeleton-fullscreen">
+          {skelData.component}
         </div>
-        <div className="route-skeleton-main">
-          <div className="route-skeleton-row top">
-            <div className="route-skeleton-block tall"></div>
-            <div className="route-skeleton-block"></div>
-            <div className="route-skeleton-block"></div>
+      ) : skelData ? (
+        /* Dashboard-layout skeleton (sidebar + topbar + page content) */
+        <div className="route-skeleton-shell">
+          <div className="route-skeleton-sidebar">
+            <div className="skel skel-line route-skeleton-logo"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
           </div>
-          <div className="route-skeleton-row bottom">
-            <div className="route-skeleton-block"></div>
-            <div className="route-skeleton-block"></div>
+          <div className="route-skeleton-main route-skeleton-main--page">
+            <div className="skel-topbar-row">
+              <div className="skel skel-line" style={{ width: "280px", height: 40, borderRadius: 16 }}></div>
+              <div style={{ display: "flex", gap: 10, marginLeft: "auto" }}>
+                <div className="skel skel-line" style={{ width: 40, height: 40, borderRadius: 16 }}></div>
+                <div className="skel skel-line" style={{ width: 100, height: 40, borderRadius: 16 }}></div>
+              </div>
+            </div>
+            <div className="skel-page-content">
+              {skelData.component}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        /* Fallback generic skeleton */
+        <div className="route-skeleton-shell">
+          <div className="route-skeleton-sidebar">
+            <div className="skel skel-line route-skeleton-logo"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
+            <div className="skel skel-line route-skeleton-menu"></div>
+          </div>
+          <div className="route-skeleton-main">
+            <div className="route-skeleton-row top">
+              <div className="route-skeleton-block tall"></div>
+              <div className="route-skeleton-block"></div>
+              <div className="route-skeleton-block"></div>
+            </div>
+            <div className="route-skeleton-row bottom">
+              <div className="route-skeleton-block"></div>
+              <div className="route-skeleton-block"></div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.2",
-    "framer-motion": "^12.38.0",
+    "framer-motion": "^11.18.2",
     "parcel": "^2.16.4",
     "postcss": "^8.5.9",
     "react": "^19.2.5",
